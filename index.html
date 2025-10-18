@@ -89,19 +89,20 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
   font-weight: bold;
   border-radius: 8px;
 }
 
 .front {
   background-color: #f2f2f2;
+  font-size: 4rem; /* Large emoji size - 64px */
 }
 
 .back {
   background-color: #4CAF50;
   color: white;
   transform: rotateY(180deg);
+  font-size: 24px; /* Keep text size as original */
 }
 
 /* Responsive styles */
@@ -125,8 +126,12 @@ button:hover {
     height: 120px;
   }
 
-  .front, .back {
-    font-size: 20px;
+  .front {
+    font-size: 3rem; /* 48px for tablets */
+  }
+
+  .back {
+    font-size: 20px; /* Keep text size as original */
   }
 }
 
@@ -149,8 +154,12 @@ button:hover {
     height: 100px;
   }
 
-  .front, .back {
-    font-size: 16px;
+  .front {
+    font-size: 2.5rem; /* 40px for mobile */
+  }
+
+  .back {
+    font-size: 16px; /* Keep text size as original */
   }
 }
   </style>
