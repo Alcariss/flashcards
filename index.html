@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flashcards</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#007BFF">
+  <meta name="description" content="Interactive flashcards for learning fruits, vegetables, animals and more">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Flashcards">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- Fallback for older browsers -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  
   <style>
 /* General styles for the page */
 body {
@@ -182,7 +198,6 @@ button:hover {
     <button id="refreshButton">Refresh Flashcards</button>
   </div>
 
-  <h1>Flashcards</h1>
   <div class="grid"></div>
 
   <script>
@@ -394,6 +409,80 @@ button:hover {
 
     // Initialize
     createFlashcards();
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      
+      // Show install button
+      const installBtn = document.createElement('button');
+      installBtn.textContent = '📱 Install App';
+      installBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 14px;';
+      installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          deferredPrompt = null;
+          installBtn.remove();
+        });
+      });
+      document.body.appendChild(installBtn);
+    });
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('SW registered successfully:', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              console.log('New service worker available');
+            });
+          })
+          .catch(registrationError => {
+            console.error('SW registration failed:', registrationError);
+          });
+      });
+    } else {
+      console.log('Service workers are not supported');
+    }
+
+    // Network status indicator
+    function updateNetworkStatus() {
+      const status = navigator.onLine ? 'online' : 'offline';
+      let indicator = document.getElementById('network-status');
+      
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'network-status';
+        indicator.style.cssText = 'position: fixed; top: 10px; left: 10px; padding: 5px 10px; border-radius: 15px; font-size: 12px; z-index: 1000;';
+        document.body.appendChild(indicator);
+      }
+      
+      if (status === 'online') {
+        indicator.style.background = '#28a745';
+        indicator.style.color = 'white';
+        indicator.textContent = '🟢 Online';
+      } else {
+        indicator.style.background = '#dc3545';
+        indicator.style.color = 'white';
+        indicator.textContent = '🔴 Offline';
+      }
+    }
+    
+    // Update network status
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus(); // Initial check
   </script>
 </body>
 </html>
