@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards</title>
+  <style>
+/* General styles for the page */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  margin: 20px 0;
+  font-size: 28px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007BFF;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#refreshButton {
+  background-color: #2196F3;
+}
+
+#refreshButton:hover {
+  background-color: #0b7dda;
+}
+
+/* Grid layout for flashcards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Flashcard container */
+.flashcard {
+  width: 100%;
+  height: 150px;
+  perspective: 1000px; /* Enable 3D perspective for flipping */
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d; /* Preserve 3D for child elements */
+  transition: transform 0.5s; /* Smooth flipping animation */
+}
+
+.flashcard.flip .inner {
+  transform: rotateY(180deg); /* Flip the card */
+}
+
+/* Front and back of the flashcard */
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; /* Hide the back side when not visible */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px; /* Fixed font size */
+  font-weight: bold;
+}
+
+.front {
+  background-color: #f2f2f2;
+}
+
+.back {
+  background-color: #4CAF50;
+  color: white;
+  transform: rotateY(180deg); /* Position the back side for flipping */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    padding: 10px;
+  }
+
+  .flashcard {
+    height: 120px; /* Reduce height for smaller screens */
+  }
+
+  .front, .back {
+    font-size: 20px; /* Adjust font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  .flashcard {
+    height: 100px; /* Further reduce height for very small screens */
+  }
+
+  .front, .back {
+    font-size: 16px; /* Further adjust font size for very small screens */
+  }
+}
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button id="fruitsButton">Fruits</button>
+    <button id="vegetablesButton">Vegetables</button>
+    <button id="vehiclesButton">Vehicles</button>
+    <button id="animalsButton">Animals</button>
+    <button id="sportsButton">Sports</button>
+    <button id="refreshButton">Refresh Flashcards</button>
+  </div>
+
+  <h1>Flashcards</h1>
+  <div class="grid"></div>
+
+  <script>
+    // Arrays of categories (fruits, vegetables, vehicles) with their emojis and names
+const fruits = [
+  { name: "Apple", emoji: "🍎" },
+  { name: "Banana", emoji: "🍌" },
+  { name: "Cherry", emoji: "🍒" },
+  { name: "Grape", emoji: "🍇" },
+  { name: "Lemon", emoji: "🍋" },
+  { name: "Mango", emoji: "🥭" },
+  { name: "Orange", emoji: "🍊" },
+  { name: "Peach", emoji: "🍑" },
+  { name: "Pear", emoji: "🍐" },
+  { name: "Pineapple", emoji: "🍍" },
+  { name: "Strawberry", emoji: "🍓" },
+  { name: "Watermelon", emoji: "🍉" },
+  { name: "Kiwi", emoji: "🥝" },
+  { name: "Blueberry", emoji: "🫐" },
+  { name: "Coconut", emoji: "🥥" },
+  { name: "Avocado", emoji: "🥑" },
+  { name: "Tangerine", emoji: "🍊" }
+];
+
+const vegetables = [
+  { name: "Carrot", emoji: "🥕" },
+  { name: "Broccoli", emoji: "🥦" },
+  { name: "Potato", emoji: "🥔" },
+  { name: "Tomato", emoji: "🍅" },
+  { name: "Cucumber", emoji: "🥒" },
+  { name: "Onion", emoji: "🧅" },
+  { name: "Garlic", emoji: "🧄" },
+  { name: "Eggplant", emoji: "🍆" },
+  { name: "Pepper", emoji: "🌶️" },
+  { name: "Lettuce", emoji: "🥬" },
+  { name: "Corn", emoji: "🌽" },
+  { name: "Mushroom", emoji: "🍄" },
+  { name: "Zucchini", emoji: "🥒" },
+  { name: "Spinach", emoji: "🍃" },
+  { name: "Asparagus", emoji: "🌿" }
+];
+
+const vehicles = [
+  { name: "Car", emoji: "🚗" },
+  { name: "Bus", emoji: "🚌" },
+  { name: "Bicycle", emoji: "🚲" },
+  { name: "Motorcycle", emoji: "🏍️" },
+  { name: "Truck", emoji: "🚚" },
+  { name: "Airplane", emoji: "✈️" },
+  { name: "Boat", emoji: "⛴️" },
+  { name: "Helicopter", emoji: "🚁" },
+  { name: "Train", emoji: "🚆" },
+  { name: "Tram", emoji: "🚋" },
+  { name: "Scooter", emoji: "🛴" },
+  { name: "Rocket", emoji: "🚀" },
+  { name: "Taxi", emoji: "🚖" },
+  { name: "Ship", emoji: "🚢" },
+  { name: "Submarine", emoji: "🛳️" }
+];
+
+const animals = [
+  { name: "Dog", emoji: "🐶" },
+  { name: "Cat", emoji: "🐱" },
+  { name: "Mouse", emoji: "🐭" },
+  { name: "Hamster", emoji: "🐹" },
+  { name: "Rabbit", emoji: "🐰" },
+  { name: "Fox", emoji: "🦊" },
+  { name: "Bear", emoji: "🐻" },
+  { name: "Panda", emoji: "🐼" },
+  { name: "Koala", emoji: "🐨" },
+  { name: "Tiger", emoji: "🐯" },
+  { name: "Lion", emoji: "🦁" },
+  { name: "Cow", emoji: "🐮" },
+  { name: "Pig", emoji: "🐷" },
+  { name: "Frog", emoji: "🐸" },
+  { name: "Monkey", emoji: "🐵" },
+  { name: "Chicken", emoji: "🐔" },
+  { name: "Penguin", emoji: "🐧" },
+  { name: "Bird", emoji: "🐦" },
+  { name: "Baby Chick", emoji: "🐤" },
+  { name: "Hatching Chick", emoji: "🐣" },
+  { name: "Duck", emoji: "🦆" },
+  { name: "Eagle", emoji: "🦅" },
+  { name: "Owl", emoji: "🦉" },
+  { name: "Bat", emoji: "🦇" },
+  { name: "Wolf", emoji: "🐺" },
+  { name: "Horse", emoji: "🐴" },
+  { name: "Unicorn", emoji: "🦄" },
+  { name: "Bee", emoji: "🐝" },
+  { name: "Bug", emoji: "🐛" },
+  { name: "Butterfly", emoji: "🦋" },
+  { name: "Snail", emoji: "🐌" },
+  { name: "Lady Beetle", emoji: "🐞" },
+  { name: "Ant", emoji: "🐜" },
+  { name: "Spider", emoji: "🕷️" },
+  { name: "Scorpion", emoji: "🦂" },
+  { name: "Crab", emoji: "🦀" },
+  { name: "Lobster", emoji: "🦞" },
+  { name: "Shrimp", emoji: "🦐" },
+  { name: "Squid", emoji: "🦑" },
+  { name: "Octopus", emoji: "🐙" },
+  { name: "Fish", emoji: "🐟" },
+  { name: "Tropical Fish", emoji: "🐠" },
+  { name: "Blowfish", emoji: "🐡" },
+  { name: "Shark", emoji: "🦈" },
+  { name: "Whale", emoji: "🐳" },
+  { name: "Dolphin", emoji: "🐬" },
+  { name: "Crocodile", emoji: "🐊" },
+  { name: "Turtle", emoji: "🐢" },
+  { name: "Lizard", emoji: "🦎" },
+  { name: "Snake", emoji: "🐍" },
+  { name: "Dragon", emoji: "🐉" },
+  { name: "Sauropod", emoji: "🦕" },
+  { name: "T-Rex", emoji: "🦖" }
+];
+
+const sports = [
+  { name: "playing football", emoji: "⚽️" },
+  { name: "playing basketball", emoji: "🏀" },
+  { name: "rollerblading", emoji: "🛼" },
+  { name: "swimming", emoji: "🏊‍♀️" },
+  { name: "skateboarding", emoji: "🛹" },
+  { name: "flying a kite", emoji: "🪁" },
+  { name: "riding a bike", emoji: "🚲" },
+  { name: "bouncing", emoji: "⛹" },
+  { name: "throwing a ball", emoji: "🤽‍♀️" },
+  { name: "playing baseball", emoji: "🥎" }
+]
+
+// Default category is fruits
+let selectedCategory = fruits;
+
+// Select grid container
+const grid = document.querySelector('.grid');
+
+// Shuffle function to randomize the order of items
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
+  }
+  return arr;
+}
+
+// Function to create and display flashcards
+function createFlashcards() {
+  grid.innerHTML = '';  // Clear the grid
+
+  const shuffledItems = shuffleArray(selectedCategory);
+  const selectedItems = shuffledItems.slice(0, 9);  // Get the first 9 items for the 3x3 grid
+
+  selectedItems.forEach(item => {
+    const card = document.createElement('div');
+    card.classList.add('flashcard');
+
+    const inner = document.createElement('div');
+    inner.classList.add('inner');
+
+    const front = document.createElement('div');
+    front.classList.add('front');
+    front.textContent = item.emoji;
+
+    const back = document.createElement('div');
+    back.classList.add('back');
+    back.textContent = item.name;
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+    grid.appendChild(card);
+
+    // Pronunciation and flip functionality on click
+    front.addEventListener('click', () => {
+      pronounce(item.name);
+      card.classList.toggle('flip');
+    });
+
+    back.addEventListener('click', () => {
+      card.classList.toggle('flip');
+    });
+  });
+}
+
+// Function to pronounce the name of the fruit, vegetable, or vehicle
+function pronounce(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';  // Set language to English
+  speechSynthesis.speak(utterance);
+}
+
+// Event listeners for category buttons
+document.getElementById('fruitsButton').addEventListener('click', () => {
+  selectedCategory = fruits;
+  createFlashcards();
+});
+
+document.getElementById('vegetablesButton').addEventListener('click', () => {
+  selectedCategory = vegetables;
+  createFlashcards();
+});
+
+document.getElementById('vehiclesButton').addEventListener('click', () => {
+  selectedCategory = vehicles;
+  createFlashcards();
+});
+
+document.getElementById('animalsButton').addEventListener('click', () => {
+  selectedCategory = animals;
+  createFlashcards();
+});
+
+document.getElementById('sportsButton').addEventListener('click', () => {
+  selectedCategory = sports;
+  createFlashcards();
+});
+
+// Event listener for the refresh button
+document.getElementById('refreshButton').addEventListener('click', () => {
+  createFlashcards();  // Reload the flashcards
+});
+
+// Initial call to populate the grid with fruits
+createFlashcards();
+
+  </script>
+</body>
+</html>
