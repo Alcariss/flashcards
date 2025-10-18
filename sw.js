@@ -7,6 +7,12 @@ const urlsToCache = [
   './icon-512.png'
 ];
 
+// iOS-specific: Detect if running as standalone app
+const isStandalone = () => {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+         window.navigator.standalone === true;
+};
+
 // Install event - cache resources
 self.addEventListener('install', event => {
   event.waitUntil(

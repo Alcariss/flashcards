@@ -14,7 +14,24 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Flashcards">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- iOS Icons - Multiple Sizes -->
+  <link rel="apple-touch-icon" sizes="57x57" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+  
+  <!-- iOS Splash Screens -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
   
   <!-- Fallback for older browsers -->
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -28,6 +45,20 @@ body {
   padding: 20px;
   box-sizing: border-box;
   text-align: center;
+  /* iOS-specific: Prevent bounce scrolling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* iOS-specific: Prevent text selection */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iOS-specific: Fix viewport issues */
+@supports (-webkit-touch-callout: none) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 h1 {
@@ -410,7 +441,33 @@ button:hover {
     // Initialize
     createFlashcards();
 
-    // PWA Install Prompt
+    // iOS Detection and PWA Features
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    
+    // iOS-specific install prompt (since beforeinstallprompt doesn't work on iOS)
+    if (isIOS && !isStandalone) {
+      const iosInstallBtn = document.createElement('div');
+      iosInstallBtn.innerHTML = `
+        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                    background: #007BFF; color: white; padding: 15px 20px; border-radius: 10px; 
+                    font-size: 14px; z-index: 1000; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          📱 Install this app: Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>
+          <button onclick="this.parentElement.parentElement.remove()" 
+                  style="background: none; border: none; color: white; font-size: 18px; float: right; cursor: pointer;">×</button>
+        </div>
+      `;
+      document.body.appendChild(iosInstallBtn);
+      
+      // Auto-hide after 10 seconds
+      setTimeout(() => {
+        if (iosInstallBtn.parentElement) {
+          iosInstallBtn.remove();
+        }
+      }, 10000);
+    }
+
+    // PWA Install Prompt (for Android/Desktop)
     let deferredPrompt;
     
     window.addEventListener('beforeinstallprompt', (e) => {
