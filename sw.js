@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.2'; // Removed completion banner
-const APP_VERSION = '2.2.2'; // Removed completion banner
+const CACHE_NAME = 'flashcards-v3.3'; // Removed SW completion messages
+const APP_VERSION = '2.2.3'; // Removed SW completion messages
 const urlsToCache = [
   './',
   './index.html',
@@ -88,17 +88,6 @@ self.addEventListener('activate', event => {
     }).then(() => {
       // Claim all clients immediately
       return self.clients.claim();
-    }).then(() => {
-      // Notify clients about the update
-      return self.clients.matchAll().then(clients => {
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'APP_UPDATED',
-            version: APP_VERSION,
-            message: 'App has been updated to the latest version!'
-          });
-        });
-      });
     })
   );
 });
