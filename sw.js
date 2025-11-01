@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.7'; // iOS update mechanism fix
-const APP_VERSION = '2.2.7'; // iOS update mechanism fix
+const CACHE_NAME = 'flashcards-v3.8'; // Unified update system
+const APP_VERSION = '2.2.8'; // Unified update system
 const urlsToCache = [
   './',
   './index.html',

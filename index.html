@@ -555,67 +555,16 @@ select:focus {
           .then(registration => {
             console.log('SW registered successfully:', registration.scope);
             
-            // Handle service worker updates - Unified approach for all platforms
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              console.log('New service worker available');
-              
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed') {
-                  if (navigator.serviceWorker.controller) {
-                    // Check if running as PWA/standalone app
-                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                    
-                    // Debug logging
-                    console.log('Update detected:', {
-                      isStandalone,
-                      isIOS,
-                      userAgent: navigator.userAgent,
-                      displayMode: window.matchMedia('(display-mode: standalone)').matches,
-                      navigatorStandalone: window.navigator.standalone
-                    });
-                    
-                    // Show update notification for PWA/standalone apps
-                    if (isStandalone) {
-                      console.log('Showing update notification for PWA/standalone app');
-                      showUpdateNotification(newWorker);
-                    } else {
-                      // Web browser - just log, no notification needed
-                      console.log('New version available (web browser will auto-update)');
-                    }
-                  } else {
-                    // First time installation
-                    console.log('App cached for offline use');
-                  }
-                }
-              });
-            });
-            
-            // iOS-specific: Additional update check mechanism
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            // Simple unified update banner for PWA/standalone apps
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             
-            if (isIOS && isStandalone) {
-              // For iOS PWAs, check for updates more frequently
-              const checkIosUpdates = () => {
-                registration.update().then(() => {
-                  console.log('iOS PWA update check completed');
-                }).catch(error => {
-                  console.error('iOS PWA update check failed:', error);
-                });
-              };
-              
-              // Initial check after 2 seconds
-              setTimeout(checkIosUpdates, 2000);
-              
-              // Check every 30 seconds for updates (iOS PWAs need more frequent checks)
-              setInterval(checkIosUpdates, 30000);
-            } else {
-              // Universal update check - same frequency for all other platforms
+            if (isStandalone) {
+              // Show update banner for PWA users after 5 seconds
               setTimeout(() => {
-                registration.update();
-              }, 2000);
+                showUnifiedUpdateBanner();
+              }, 5000);
+            } else {
+              console.log('Running in browser - no update banner needed');
             }
           })
           .catch(registrationError => {
@@ -626,8 +575,8 @@ select:focus {
       console.log('Service workers are not supported');
     }
 
-    // Show update notification (PWA/standalone apps only)
-    function showUpdateNotification(newWorker) {
+    // Show unified update banner (PWA/standalone apps only)
+    function showUnifiedUpdateBanner() {
       // Check if notification already exists
       const existingBanner = document.getElementById('update-banner');
       if (existingBanner) {
@@ -643,40 +592,37 @@ select:focus {
       const platformText = isIOS ? 'iOS App' : 'PWA';
       
       updateBanner.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; right: 0; background: #007BFF; color: white; 
+        <div style="position: fixed; top: 0; left: 0; right: 0; background: #28a745; color: white; 
                     padding: 15px; text-align: center; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
           <div style="max-width: 600px; margin: 0 auto;">
-            <strong>${platformIcon} New Update Available!</strong><br>
-            <span style="font-size: 14px;">A new version with improvements is ready to install.</span><br>
+            <strong>${platformIcon} Check for Updates</strong><br>
+            <span style="font-size: 14px;">Tap to check for the latest version and improvements.</span><br>
             <div style="margin-top: 10px;">
-              <button onclick="updateApp()" 
-                      style="background: white; color: #007BFF; border: none; padding: 10px 20px; 
+              <button onclick="forceUpdate()" 
+                      style="background: white; color: #28a745; border: none; padding: 10px 20px; 
                              border-radius: 8px; margin: 0 5px; cursor: pointer; font-weight: bold; font-size: 14px;">
-                ✨ Update Now
+                🔄 Check & Update
               </button>
               <button onclick="dismissUpdate()" 
                       style="background: transparent; color: white; border: 2px solid white; 
                              padding: 8px 16px; border-radius: 8px; margin: 0 5px; cursor: pointer; font-size: 14px;">
-                Later
+                Not Now
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Version ${document.querySelector('[id*="version"]')?.textContent || 'Unknown'}
+              ${platformText} • Current: v2.2.8
             </div>
           </div>
         </div>
       `;
       
       document.body.appendChild(updateBanner);
-      
-      // Store reference to new worker
-      window.newServiceWorker = newWorker;
     }
 
-    // Update app function (unified for all platforms)
-    window.updateApp = function() {
+    // Force update function - works reliably on all platforms
+    window.forceUpdate = function() {
       // Show immediate feedback
-      const updateBtn = document.querySelector('button[onclick="updateApp()"]');
+      const updateBtn = document.querySelector('button[onclick="forceUpdate()"]');
       if (updateBtn) {
         updateBtn.innerHTML = '🔄 Updating...';
         updateBtn.style.background = '#ccc';
@@ -690,47 +636,34 @@ select:focus {
         const messageDiv = banner.querySelector('div > div');
         if (messageDiv) {
           messageDiv.innerHTML = `
-            <strong>🔄 Installing Update...</strong><br>
-            <span style="font-size: 14px;">Please wait, the app will reload automatically.</span>
+            <strong>🔄 Checking for Updates...</strong><br>
+            <span style="font-size: 14px;">Refreshing app content, please wait...</span>
           `;
         }
       }
       
-      // Apply update - improved mechanism for iOS PWAs
-      if (window.newServiceWorker) {
-        // Listen for the service worker to become active
-        const serviceWorkerReady = () => {
-          console.log('Service worker is now active, reloading...');
-          setTimeout(() => {
-            window.location.reload(true); // Force reload from server
-          }, 500);
-        };
-        
-        // Set up listener for when the new service worker becomes active
-        if (window.newServiceWorker.state === 'activated') {
-          serviceWorkerReady();
-        } else {
-          window.newServiceWorker.addEventListener('statechange', () => {
-            if (window.newServiceWorker.state === 'activated') {
-              serviceWorkerReady();
-            }
-          });
-        }
-        
-        // Tell the service worker to skip waiting
-        window.newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
-        
-        // Also listen for the controllerchange event as a backup
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          console.log('Controller changed, reloading...');
+      console.log('Force updating PWA...');
+      
+      // Clear all caches and force reload
+      if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+          console.log('Clearing caches:', cacheNames);
+          return Promise.all(
+            cacheNames.map(cacheName => caches.delete(cacheName))
+          );
+        }).then(() => {
+          console.log('All caches cleared, reloading...');
+          // Force reload from server, bypassing all caches
+          window.location.reload(true);
+        }).catch(error => {
+          console.error('Cache clearing failed:', error);
+          // Fallback: just force reload
           window.location.reload(true);
         });
       } else {
-        // Fallback: just reload after delay
-        console.log('No new service worker available, forcing reload');
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 1500);
+        // No cache API, just force reload
+        console.log('No cache API, force reloading...');
+        window.location.reload(true);
       }
     };
 
@@ -742,13 +675,6 @@ select:focus {
       }
     };
 
-    // Dismiss update notification
-    function checkForUpdates() {
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'GET_VERSION' });
-      }
-    }
-
     // Add version display for troubleshooting
     function addVersionDisplay() {
       const versionDisplay = document.createElement('div');
@@ -757,34 +683,13 @@ select:focus {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.2.7';
+      versionDisplay.textContent = 'v2.2.8';
       
       document.body.appendChild(versionDisplay);
     }
 
     // Add version display
     setTimeout(addVersionDisplay, 1000);
-
-    // iOS Debug: Add test button to manually trigger update banner
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      setTimeout(() => {
-        const testBtn = document.createElement('button');
-        testBtn.textContent = '🧪 Test Banner';
-        testBtn.style.cssText = `
-          position: fixed; bottom: 60px; left: 10px; z-index: 1000;
-          background: #FF9500; color: white; border: none; padding: 5px 10px;
-          border-radius: 15px; font-size: 10px; opacity: 0.7;
-        `;
-        testBtn.onclick = () => {
-          console.log('Testing banner display...');
-          showUpdateNotification({ postMessage: () => {} }); // Mock worker
-        };
-        document.body.appendChild(testBtn);
-      }, 2000);
-    }
-
-    // Unified periodic update check (every 30 minutes for all platforms)
-    setInterval(checkForUpdates, 30 * 60 * 1000);
   </script>
 </body>
 </html>
