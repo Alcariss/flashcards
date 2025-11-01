@@ -495,98 +495,7 @@ button:hover {
       }, 10000);
     }
 
-    // Enhanced iOS PWA update detection
-    if (isIOS && isStandalone) {
-      // Add iOS-specific update checking with multiple methods
-      let updateCheckInterval;
-      
-      function checkForIOSUpdates() {
-        // Method 1: Try to register service worker again to trigger update
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              return registration.update();
-            })
-            .catch(() => {
-              // Ignore errors, try other methods
-            });
-        }
-        
-        // Method 2: Check manifest version
-        fetch('./manifest.json', { cache: 'no-cache' })
-          .then(response => response.json())
-          .then(manifest => {
-            const currentVersion = '2.0.1'; // Updated to match new version
-            if (manifest.version && manifest.version !== currentVersion) {
-              console.log('Version mismatch detected:', manifest.version, 'vs', currentVersion);
-              showIOSUpdateHint();
-            }
-          })
-          .catch(() => {
-            // Method 3: Fallback - simple timestamp check
-            const lastCheck = localStorage.getItem('last-update-check');
-            const now = Date.now();
-            const sixHours = 6 * 60 * 60 * 1000;
-            
-            if (!lastCheck || (now - parseInt(lastCheck)) > sixHours) {
-              // Show update hint every 6 hours as fallback
-              showIOSUpdateHint();
-              localStorage.setItem('last-update-check', now.toString());
-            }
-          });
-      }
-      
-      // Start checking immediately and then every 2 minutes
-      checkForIOSUpdates();
-      updateCheckInterval = setInterval(checkForIOSUpdates, 2 * 60 * 1000);
-      
-      // Add manual refresh detection
-      let pageLoadTime = Date.now();
-      window.addEventListener('pageshow', (event) => {
-        if (event.persisted) {
-          // Page was loaded from cache, check for updates
-          setTimeout(checkForIOSUpdates, 1000);
-        }
-      });
-    }
-
-    // iOS update hint function
-    function showIOSUpdateHint() {
-      // Don't show if already shown recently
-      const lastShown = localStorage.getItem('ios-update-hint-shown');
-      const now = Date.now();
-      if (lastShown && (now - parseInt(lastShown)) < 24 * 60 * 60 * 1000) { // 24 hours
-        return;
-      }
-      
-      const hint = document.createElement('div');
-      hint.style.cssText = `
-        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-        background: #FF9500; color: white; padding: 15px 20px; border-radius: 10px;
-        font-size: 14px; z-index: 10000; text-align: center; max-width: 300px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      `;
-      hint.innerHTML = `
-        <div>
-          <strong>🍎 Update Available</strong><br>
-          <small>Close and reopen the app to get the latest version</small><br>
-          <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('ios-update-hint-shown', Date.now());" 
-                  style="background: white; color: #FF9500; border: none; padding: 5px 10px; 
-                         border-radius: 5px; margin-top: 8px; cursor: pointer; font-size: 12px;">
-            Got it!
-          </button>
-        </div>
-      `;
-      document.body.appendChild(hint);
-      
-      // Auto-remove after 8 seconds
-      setTimeout(() => {
-        if (hint.parentElement) {
-          hint.remove();
-          localStorage.setItem('ios-update-hint-shown', now);
-        }
-      }, 8000);
-    }
+    // iOS PWA updates now work automatically via service worker
 
     // PWA Install Prompt (for Android/Desktop)
     let deferredPrompt;
@@ -713,34 +622,6 @@ button:hover {
       }
     };
 
-    // iOS-specific update instructions
-    window.showIOSUpdateInstructions = function() {
-      const modal = document.createElement('div');
-      modal.style.cssText = `
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-        background: rgba(0,0,0,0.8); z-index: 20000; 
-        display: flex; align-items: center; justify-content: center;
-      `;
-      modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 400px; margin: 20px; text-align: center;">
-          <h3 style="margin-top: 0; color: #333;">🍎 How to Update on iOS</h3>
-          <div style="text-align: left; margin: 20px 0; line-height: 1.6;">
-            <p><strong>Step 1:</strong> Swipe up from the bottom of your screen</p>
-            <p><strong>Step 2:</strong> Find the Flashcards app card</p>
-            <p><strong>Step 3:</strong> Swipe up on the app card to close it</p>
-            <p><strong>Step 4:</strong> Tap the Flashcards icon on your home screen</p>
-            <p><strong>Step 5:</strong> The app will reload with the update!</p>
-          </div>
-          <button onclick="this.parentElement.parentElement.remove()" 
-                  style="background: #007BFF; color: white; border: none; padding: 12px 24px; 
-                         border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px;">
-            Got it! 👍
-          </button>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    };
-
     // Dismiss update notification
     window.dismissUpdate = function() {
       const banner = document.getElementById('update-banner');
@@ -825,51 +706,6 @@ button:hover {
       }
     }
 
-    // Add manual update check button
-    function addUpdateCheckButton() {
-      const updateBtn = document.createElement('button');
-      updateBtn.textContent = isIOS ? '🍎 Check Updates' : '🔄 Check Updates';
-      updateBtn.style.cssText = `
-        position: fixed; bottom: 10px; right: 10px; z-index: 1000; 
-        background: ${isIOS ? '#FF9500' : '#17a2b8'}; color: white; border: none; padding: 8px 12px; 
-        border-radius: 20px; cursor: pointer; font-size: 12px; opacity: 0.7;
-        transition: opacity 0.3s;
-      `;
-      updateBtn.onmouseover = () => updateBtn.style.opacity = '1';
-      updateBtn.onmouseout = () => updateBtn.style.opacity = '0.7';
-      updateBtn.onclick = () => {
-        // Show immediate feedback
-        updateBtn.textContent = '🔄 Checking...';
-        updateBtn.style.background = '#6c757d';
-        
-        if (isIOS) {
-          // Force iOS update check
-          checkForIOSUpdates();
-          // Also show the update instructions immediately
-          setTimeout(() => {
-            showIOSUpdateHint();
-            updateBtn.textContent = '🍎 Check Updates';
-            updateBtn.style.background = '#FF9500';
-          }, 1000);
-        } else {
-          checkForUpdates();
-          // Force check for updates
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistration().then(registration => {
-              if (registration) {
-                registration.update();
-              }
-            });
-          }
-          setTimeout(() => {
-            updateBtn.textContent = '🔄 Check Updates';
-            updateBtn.style.background = '#17a2b8';
-          }, 2000);
-        }
-      };
-      document.body.appendChild(updateBtn);
-    }
-
     // Add version display for troubleshooting
     function addVersionDisplay() {
       const versionDisplay = document.createElement('div');
@@ -878,27 +714,24 @@ button:hover {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.0.2';
+      versionDisplay.textContent = 'v2.0.3';
       
       // Make it show more info when clicked
       versionDisplay.onclick = () => {
         const now = new Date();
         versionDisplay.innerHTML = `
-          v2.0.2<br>
+          v2.0.3<br>
           ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}<br>
           ${isIOS ? '🍎 iOS' : '🤖 Other'}
         `;
         setTimeout(() => {
-          versionDisplay.textContent = 'v2.0.2';
+          versionDisplay.textContent = 'v2.0.3';
         }, 3000);
       };
       
       document.body.appendChild(versionDisplay);
     }
 
-    // Add the update check button after a delay
-    setTimeout(addUpdateCheckButton, 2000);
-    
     // Add version display
     setTimeout(addVersionDisplay, 1000);
 
