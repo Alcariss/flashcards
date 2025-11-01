@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.4'; // Removed network indicator
-const APP_VERSION = '2.0.4'; // Removed network indicator
+const CACHE_NAME = 'flashcards-v2.6'; // Force iOS update 2024-11-01
+const APP_VERSION = '2.0.6'; // Force iOS update 2024-11-01
 const urlsToCache = [
   './',
   './index.html',

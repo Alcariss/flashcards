@@ -416,7 +416,7 @@ button:hover {
 
     const pronounce = (text) => {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
+      utterance.lang = 'en-UK';
       speechSynthesis.speak(utterance);
     };
 
@@ -554,6 +554,19 @@ button:hover {
                 showUpdateCompletedNotification(event.data);
               }
             });
+            
+            // iOS-specific: Force update check more aggressively
+            if (isIOS && isStandalone) {
+              // Check for updates every 5 minutes on iOS
+              setInterval(() => {
+                registration.update();
+              }, 5 * 60 * 1000);
+              
+              // Force immediate update check
+              setTimeout(() => {
+                registration.update();
+              }, 2000);
+            }
           })
           .catch(registrationError => {
             console.error('SW registration failed:', registrationError);
@@ -686,20 +699,7 @@ button:hover {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.0.4';
-      
-      // Make it show more info when clicked
-      versionDisplay.onclick = () => {
-        const now = new Date();
-        versionDisplay.innerHTML = `
-          v2.0.4<br>
-          ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}<br>
-          ${isIOS ? '🍎 iOS' : '🤖 Other'}
-        `;
-        setTimeout(() => {
-          versionDisplay.textContent = 'v2.0.4';
-        }, 3000);
-      };
+      versionDisplay.textContent = 'v2.0.6';
       
       document.body.appendChild(versionDisplay);
     }
