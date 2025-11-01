@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.3'; // Cleaned up version
-const APP_VERSION = '2.0.3'; // Cleaned up version
+const CACHE_NAME = 'flashcards-v2.4'; // Removed network indicator
+const APP_VERSION = '2.0.4'; // Removed network indicator
 const urlsToCache = [
   './',
   './index.html',

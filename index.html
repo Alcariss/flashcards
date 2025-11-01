@@ -671,34 +671,6 @@ button:hover {
       }, 5000);
     }
 
-    // Network status indicator
-    function updateNetworkStatus() {
-      const status = navigator.onLine ? 'online' : 'offline';
-      let indicator = document.getElementById('network-status');
-      
-      if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.id = 'network-status';
-        indicator.style.cssText = 'position: fixed; top: 10px; left: 10px; padding: 5px 10px; border-radius: 15px; font-size: 12px; z-index: 1000;';
-        document.body.appendChild(indicator);
-      }
-      
-      if (status === 'online') {
-        indicator.style.background = '#28a745';
-        indicator.style.color = 'white';
-        indicator.textContent = '🟢 Online';
-      } else {
-        indicator.style.background = '#dc3545';
-        indicator.style.color = 'white';
-        indicator.textContent = '🔴 Offline';
-      }
-    }
-    
-    // Update network status
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
-    updateNetworkStatus(); // Initial check
-
     // Add version check and update functionality
     function checkForUpdates() {
       if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
@@ -714,18 +686,18 @@ button:hover {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.0.3';
+      versionDisplay.textContent = 'v2.0.4';
       
       // Make it show more info when clicked
       versionDisplay.onclick = () => {
         const now = new Date();
         versionDisplay.innerHTML = `
-          v2.0.3<br>
+          v2.0.4<br>
           ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}<br>
           ${isIOS ? '🍎 iOS' : '🤖 Other'}
         `;
         setTimeout(() => {
-          versionDisplay.textContent = 'v2.0.3';
+          versionDisplay.textContent = 'v2.0.4';
         }, 3000);
       };
       
