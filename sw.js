@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.8'; // iOS aggressive update fix
-const APP_VERSION = '2.1.1'; // iOS aggressive update fix
+const CACHE_NAME = 'flashcards-v2.9'; // Silent iOS updates
+const APP_VERSION = '2.1.2'; // Silent iOS updates
 const urlsToCache = [
   './',
   './index.html',
