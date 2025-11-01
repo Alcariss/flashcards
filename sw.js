@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.8'; // Unified update system
-const APP_VERSION = '2.2.8'; // Unified update system
+const CACHE_NAME = 'flashcards-v3.9'; // Bottom banner test
+const APP_VERSION = '2.2.9'; // Bottom banner test
 const urlsToCache = [
   './',
   './index.html',
