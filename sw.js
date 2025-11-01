@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.4'; // Debug iOS standalone detection
-const APP_VERSION = '2.2.4'; // Debug iOS standalone detection
+const CACHE_NAME = 'flashcards-v3.5'; // iOS banner test
+const APP_VERSION = '2.2.5'; // iOS banner test
 const urlsToCache = [
   './',
   './index.html',

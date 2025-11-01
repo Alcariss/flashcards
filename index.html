@@ -709,13 +709,31 @@ select:focus {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.2.4';
+      versionDisplay.textContent = 'v2.2.5';
       
       document.body.appendChild(versionDisplay);
     }
 
     // Add version display
     setTimeout(addVersionDisplay, 1000);
+
+    // iOS Debug: Add test button to manually trigger update banner
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      setTimeout(() => {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = '🧪 Test Banner';
+        testBtn.style.cssText = `
+          position: fixed; bottom: 60px; left: 10px; z-index: 1000;
+          background: #FF9500; color: white; border: none; padding: 5px 10px;
+          border-radius: 15px; font-size: 10px; opacity: 0.7;
+        `;
+        testBtn.onclick = () => {
+          console.log('Testing banner display...');
+          showUpdateNotification({ postMessage: () => {} }); // Mock worker
+        };
+        document.body.appendChild(testBtn);
+      }, 2000);
+    }
 
     // Unified periodic update check (every 30 minutes for all platforms)
     setInterval(checkForUpdates, 30 * 60 * 1000);
