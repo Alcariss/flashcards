@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2'; // Increment version for updates
-const APP_VERSION = '2.0.0'; // App version for update detection
+const CACHE_NAME = 'flashcards-v2.2'; // Increment version for testing
+const APP_VERSION = '2.0.2'; // Increment for testing
 const urlsToCache = [
   './',
   './index.html',
