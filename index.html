@@ -696,15 +696,42 @@ select:focus {
         }
       }
       
-      // Apply update
+      // Apply update - improved mechanism for iOS PWAs
       if (window.newServiceWorker) {
+        // Listen for the service worker to become active
+        const serviceWorkerReady = () => {
+          console.log('Service worker is now active, reloading...');
+          setTimeout(() => {
+            window.location.reload(true); // Force reload from server
+          }, 500);
+        };
+        
+        // Set up listener for when the new service worker becomes active
+        if (window.newServiceWorker.state === 'activated') {
+          serviceWorkerReady();
+        } else {
+          window.newServiceWorker.addEventListener('statechange', () => {
+            if (window.newServiceWorker.state === 'activated') {
+              serviceWorkerReady();
+            }
+          });
+        }
+        
+        // Tell the service worker to skip waiting
         window.newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+        
+        // Also listen for the controllerchange event as a backup
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('Controller changed, reloading...');
+          window.location.reload(true);
+        });
+      } else {
+        // Fallback: just reload after delay
+        console.log('No new service worker available, forcing reload');
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1500);
       }
-      
-      // Reload after a short delay to show feedback
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
     };
 
     // Dismiss update notification
@@ -730,7 +757,7 @@ select:focus {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.2.6';
+      versionDisplay.textContent = 'v2.2.7';
       
       document.body.appendChild(versionDisplay);
     }

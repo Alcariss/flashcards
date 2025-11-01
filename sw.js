@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.6'; // iOS update detection fix
-const APP_VERSION = '2.2.6'; // iOS update detection fix
+const CACHE_NAME = 'flashcards-v3.7'; // iOS update mechanism fix
+const APP_VERSION = '2.2.7'; // iOS update mechanism fix
 const urlsToCache = [
   './',
   './index.html',
@@ -96,7 +96,10 @@ self.addEventListener('activate', event => {
 
 // Handle messages from main app
 self.addEventListener('message', event => {
+  console.log('Service worker received message:', event.data);
+  
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('SKIP_WAITING message received, activating new service worker');
     self.skipWaiting();
   }
   
