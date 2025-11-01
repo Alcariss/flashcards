@@ -1,7 +1,7 @@
 {
   "name": "Flashcards Learning App",
   "short_name": "Flashcards",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "Interactive flashcards for learning fruits, vegetables, animals and more",
   "start_url": "./",
   "scope": "./",

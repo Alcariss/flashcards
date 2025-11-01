@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.5'; // iOS banner test
-const APP_VERSION = '2.2.5'; // iOS banner test
+const CACHE_NAME = 'flashcards-v3.6'; // iOS update detection fix
+const APP_VERSION = '2.2.6'; // iOS update detection fix
 const urlsToCache = [
   './',
   './index.html',
@@ -16,11 +16,11 @@ const isStandalone = () => {
 
 // Install event - cache resources
 self.addEventListener('install', event => {
-  console.log('Service Worker installing...');
+  console.log('Service Worker installing... Version:', APP_VERSION);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache:', CACHE_NAME);
         return cache.addAll(urlsToCache);
       })
       .catch(error => {
@@ -28,7 +28,7 @@ self.addEventListener('install', event => {
       })
   );
   // Force the waiting service worker to become the active service worker
-  // This is more aggressive for iOS
+  // This is more aggressive for iOS PWAs
   self.skipWaiting();
 });
 
@@ -75,6 +75,7 @@ self.addEventListener('fetch', event => {
 
 // Activate event - clean up old caches and handle updates
 self.addEventListener('activate', event => {
+  console.log('Service Worker activating... Version:', APP_VERSION);
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -86,6 +87,7 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
+      console.log('Service Worker activated, claiming clients');
       // Claim all clients immediately
       return self.clients.claim();
     })
