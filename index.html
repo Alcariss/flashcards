@@ -89,6 +89,35 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Dropdown select styling */
+select {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 2px solid #007BFF;
+  border-radius: 8px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  min-width: 200px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 45px;
+}
+
+select:hover {
+  border-color: #0056b3;
+  background-color: #f8f9fa;
+}
+
+select:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
 #refreshButton {
   background-color: #2196F3;
 }
@@ -161,9 +190,10 @@ button:hover {
     align-items: center;
   }
 
-  button {
+  select {
     width: 100%;
     max-width: 300px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 
   .grid {
@@ -191,9 +221,10 @@ button:hover {
     font-size: 24px;
   }
 
-  button {
-    font-size: 14px;
-    padding: 8px 16px;
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 10px 16px;
+    max-width: 280px;
   }
 
   .grid {
@@ -220,14 +251,15 @@ button:hover {
 <body>
 
   <div class="controls">
-    <button data-category="fruits">Fruits</button>
-    <button data-category="vegetables">Vegetables</button>
-    <button data-category="vehicles">Vehicles</button>
-    <button data-category="animals">Animals</button>
-    <button data-category="sports">Sports</button>
-    <button data-category="clothing">Clothing</button>
-    <button data-category="halloween">🎃 Halloween</button>
-    <button id="refreshButton">Refresh Flashcards</button>
+    <select id="categorySelect">
+      <option value="fruits">🍎 Fruits</option>
+      <option value="vegetables">🥕 Vegetables</option>
+      <option value="vehicles">🚗 Vehicles</option>
+      <option value="animals">🐶 Animals</option>
+      <option value="sports">⚽ Sports</option>
+      <option value="clothing">👕 Clothing</option>
+      <option value="halloween">🎃 Halloween</option>
+    </select>
   </div>
 
   <div class="grid"></div>
@@ -453,17 +485,10 @@ button:hover {
     };
 
     // Event listeners
-    document.addEventListener('click', (e) => {
-      const categoryBtn = e.target.closest('[data-category]');
-      if (categoryBtn) {
-        selectedCategory = categoryBtn.dataset.category;
-        createFlashcards();
-        return;
-      }
-
-      if (e.target.id === 'refreshButton') {
-        createFlashcards();
-      }
+    const categorySelect = document.getElementById('categorySelect');
+    categorySelect.addEventListener('change', (e) => {
+      selectedCategory = e.target.value;
+      createFlashcards();
     });
 
     // Initialize
@@ -699,7 +724,7 @@ button:hover {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.0.6';
+      versionDisplay.textContent = 'v2.1.0';
       
       document.body.appendChild(versionDisplay);
     }

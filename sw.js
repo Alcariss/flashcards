@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.6'; // Force iOS update 2024-11-01
-const APP_VERSION = '2.0.6'; // Force iOS update 2024-11-01
+const CACHE_NAME = 'flashcards-v2.7'; // Dropdown navigation
+const APP_VERSION = '2.1.0'; // Dropdown navigation
 const urlsToCache = [
   './',
   './index.html',
