@@ -555,7 +555,7 @@ select:focus {
           .then(registration => {
             console.log('SW registered successfully:', registration.scope);
             
-            // Handle service worker updates - Silent on iOS, notification on others
+            // Handle service worker updates - Unified approach for all platforms
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
               console.log('New service worker available');
@@ -563,27 +563,15 @@ select:focus {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed') {
                   if (navigator.serviceWorker.controller) {
-                    // New update available
-                    if (isIOS && isStandalone) {
-                      // iOS: Silent update - just force it
-                      newWorker.postMessage({ type: 'SKIP_WAITING' });
-                      // Clear caches and reload after short delay
-                      setTimeout(() => {
-                        if ('caches' in window) {
-                          caches.keys().then(cacheNames => {
-                            return Promise.all(
-                              cacheNames.map(cacheName => caches.delete(cacheName))
-                            );
-                          }).then(() => {
-                            window.location.reload(true);
-                          });
-                        } else {
-                          window.location.reload(true);
-                        }
-                      }, 1000);
-                    } else {
-                      // Other platforms: Show notification
+                    // Check if running as PWA/standalone app
+                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                    
+                    if (isStandalone) {
+                      // Only show update notification for PWA/standalone apps
                       showUpdateNotification(newWorker);
+                    } else {
+                      // Web browser - just log, no notification needed
+                      console.log('New version available (web browser will auto-update)');
                     }
                   } else {
                     // First time installation
@@ -600,18 +588,10 @@ select:focus {
               }
             });
             
-            // iOS-specific: Force update check more aggressively
-            if (isIOS && isStandalone) {
-              // Check for updates every 5 minutes on iOS
-              setInterval(() => {
-                registration.update();
-              }, 5 * 60 * 1000);
-              
-              // Force immediate update check
-              setTimeout(() => {
-                registration.update();
-              }, 2000);
-            }
+            // Universal update check - same frequency for all platforms
+            setTimeout(() => {
+              registration.update();
+            }, 2000);
           })
           .catch(registrationError => {
             console.error('SW registration failed:', registrationError);
@@ -621,27 +601,43 @@ select:focus {
       console.log('Service workers are not supported');
     }
 
-    // Show update notification (non-iOS only)
+    // Show update notification (PWA/standalone apps only)
     function showUpdateNotification(newWorker) {
+      // Check if notification already exists
+      const existingBanner = document.getElementById('update-banner');
+      if (existingBanner) {
+        existingBanner.remove();
+      }
+      
       const updateBanner = document.createElement('div');
       updateBanner.id = 'update-banner';
       
+      // Detect platform for appropriate messaging
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const platformIcon = isIOS ? '🍎' : '📱';
+      const platformText = isIOS ? 'iOS App' : 'PWA';
+      
       updateBanner.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; right: 0; background: #28a745; color: white; 
+        <div style="position: fixed; top: 0; left: 0; right: 0; background: #007BFF; color: white; 
                     padding: 15px; text-align: center; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
           <div style="max-width: 600px; margin: 0 auto;">
-            <strong>🚀 New version available!</strong><br>
-            <span style="font-size: 14px;">Click to update to the latest version with new features.</span><br>
-            <button onclick="updateApp()" 
-                    style="background: white; color: #28a745; border: none; padding: 8px 16px; 
-                           border-radius: 5px; margin: 8px 5px 0 0; cursor: pointer; font-weight: bold;">
-              Update Now
-            </button>
-            <button onclick="dismissUpdate()" 
-                    style="background: transparent; color: white; border: 1px solid white; 
-                           padding: 8px 16px; border-radius: 5px; margin: 8px 0 0 5px; cursor: pointer;">
-              Later
-            </button>
+            <strong>${platformIcon} New Update Available!</strong><br>
+            <span style="font-size: 14px;">A new version with improvements is ready to install.</span><br>
+            <div style="margin-top: 10px;">
+              <button onclick="updateApp()" 
+                      style="background: white; color: #007BFF; border: none; padding: 10px 20px; 
+                             border-radius: 8px; margin: 0 5px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                ✨ Update Now
+              </button>
+              <button onclick="dismissUpdate()" 
+                      style="background: transparent; color: white; border: 2px solid white; 
+                             padding: 8px 16px; border-radius: 8px; margin: 0 5px; cursor: pointer; font-size: 14px;">
+                Later
+              </button>
+            </div>
+            <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
+              ${platformText} • Version ${document.querySelector('[id*="version"]')?.textContent || 'Unknown'}
+            </div>
           </div>
         </div>
       `;
@@ -652,12 +648,38 @@ select:focus {
       window.newServiceWorker = newWorker;
     }
 
-    // Update app function
+    // Update app function (unified for all platforms)
     window.updateApp = function() {
+      // Show immediate feedback
+      const updateBtn = document.querySelector('button[onclick="updateApp()"]');
+      if (updateBtn) {
+        updateBtn.innerHTML = '🔄 Updating...';
+        updateBtn.style.background = '#ccc';
+        updateBtn.style.color = '#666';
+        updateBtn.disabled = true;
+      }
+      
+      // Update the banner message
+      const banner = document.getElementById('update-banner');
+      if (banner) {
+        const messageDiv = banner.querySelector('div > div');
+        if (messageDiv) {
+          messageDiv.innerHTML = `
+            <strong>🔄 Installing Update...</strong><br>
+            <span style="font-size: 14px;">Please wait, the app will reload automatically.</span>
+          `;
+        }
+      }
+      
+      // Apply update
       if (window.newServiceWorker) {
         window.newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
-        window.location.reload();
       }
+      
+      // Reload after a short delay to show feedback
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     };
 
     // Dismiss update notification
@@ -724,7 +746,7 @@ select:focus {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.1.2';
+      versionDisplay.textContent = 'v2.2.1';
       
       document.body.appendChild(versionDisplay);
     }
@@ -732,7 +754,7 @@ select:focus {
     // Add version display
     setTimeout(addVersionDisplay, 1000);
 
-    // Periodic update check (every 30 minutes)
+    // Unified periodic update check (every 30 minutes for all platforms)
     setInterval(checkForUpdates, 30 * 60 * 1000);
   </script>
 </body>

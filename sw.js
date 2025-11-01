@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.9'; // Silent iOS updates
-const APP_VERSION = '2.1.2'; // Silent iOS updates
+const CACHE_NAME = 'flashcards-v3.1'; // PWA-only update notifications
+const APP_VERSION = '2.2.1'; // PWA-only update notifications
 const urlsToCache = [
   './',
   './index.html',
