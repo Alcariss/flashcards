@@ -555,13 +555,19 @@ select:focus {
           .then(registration => {
             console.log('SW registered successfully:', registration.scope);
             
-            // Simple unified update banner for PWA/standalone apps
+            // Cross-platform automatic update detection
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             
             if (isStandalone) {
-              console.log('PWA detected - update banner available via version button');
+              console.log('PWA detected - enabling automatic and manual updates');
+              
+              // Set up automatic update detection
+              setupAutomaticUpdates(registration);
+              
+              // Set up periodic background checks
+              setupPeriodicUpdateChecks(registration);
             } else {
-              console.log('Running in browser - no update banner needed');
+              console.log('Running in browser - manual updates only');
             }
           })
           .catch(registrationError => {
@@ -572,7 +578,69 @@ select:focus {
       console.log('Service workers are not supported');
     }
 
-    // Show unified update banner (PWA/standalone apps only)
+    // Automatic update detection system
+    function setupAutomaticUpdates(registration) {
+      // Listen for service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('New service worker detected - installing silently in background');
+        
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('New version available - applying update silently');
+              applySilentUpdate(newWorker);
+            }
+          });
+        }
+      });
+      
+      // Listen for controller changes (when new SW takes control)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('Service worker updated successfully in background');
+      });
+    }
+
+    // Periodic background update checks
+    function setupPeriodicUpdateChecks(registration) {
+      // Check for updates every 30 minutes
+      const checkInterval = 30 * 60 * 1000; // 30 minutes
+      
+      const performUpdateCheck = () => {
+        console.log('Performing background update check...');
+        registration.update().catch(error => {
+          console.error('Background update check failed:', error);
+        });
+      };
+      
+      // Initial check after 2 minutes
+      setTimeout(performUpdateCheck, 2 * 60 * 1000);
+      
+      // Then check every 30 minutes
+      setInterval(performUpdateCheck, checkInterval);
+      
+      // Also check when app becomes visible (user returns to app)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          console.log('App became visible - checking for updates');
+          setTimeout(performUpdateCheck, 1000);
+        }
+      });
+    }
+
+    // Apply silent background update (no user interface)
+    function applySilentUpdate(newWorker) {
+      console.log('Applying silent background update...');
+      
+      // Tell the new service worker to skip waiting and become active
+      newWorker.postMessage({ type: 'SKIP_WAITING' });
+      
+      // The new service worker will take control automatically
+      // No reload needed - users will get new content on next navigation
+      // This keeps the app running smoothly without interruption
+    }
+
+    // Show unified update banner (manual trigger via version button only)
     function showUnifiedUpdateBanner() {
       // Check if notification already exists
       const existingBanner = document.getElementById('update-banner');
@@ -607,7 +675,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.3.0
+              ${platformText} • Current: v2.3.2
             </div>
           </div>
         </div>
@@ -616,7 +684,7 @@ select:focus {
       document.body.appendChild(updateBanner);
     }
 
-    // Force update function - works reliably on all platforms
+    // Force update function - works reliably on all platforms (manual trigger)
     window.forceUpdate = function() {
       // Show immediate feedback
       const updateBtn = document.querySelector('button[onclick="forceUpdate()"]');
@@ -681,7 +749,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.3.0';
+      versionDisplay.textContent = 'v2.3.2';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.0'; // Manual update trigger
-const APP_VERSION = '2.3.0'; // Manual update trigger
+const CACHE_NAME = 'flashcards-v4.2'; // Silent background updates
+const APP_VERSION = '2.3.2'; // Silent background updates
 const urlsToCache = [
   './',
   './index.html',
