@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v2.7'; // Dropdown navigation
-const APP_VERSION = '2.1.0'; // Dropdown navigation
+const CACHE_NAME = 'flashcards-v2.8'; // iOS aggressive update fix
+const APP_VERSION = '2.1.1'; // iOS aggressive update fix
 const urlsToCache = [
   './',
   './index.html',
