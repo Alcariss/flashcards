@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.9'; // Bottom banner test
-const APP_VERSION = '2.2.9'; // Bottom banner test
+const CACHE_NAME = 'flashcards-v4.0'; // Manual update trigger
+const APP_VERSION = '2.3.0'; // Manual update trigger
 const urlsToCache = [
   './',
   './index.html',

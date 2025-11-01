@@ -559,10 +559,7 @@ select:focus {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             
             if (isStandalone) {
-              // Show update banner for PWA users after 5 seconds
-              setTimeout(() => {
-                showUnifiedUpdateBanner();
-              }, 5000);
+              console.log('PWA detected - update banner available via version button');
             } else {
               console.log('Running in browser - no update banner needed');
             }
@@ -610,7 +607,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.2.9
+              ${platformText} • Current: v2.3.0
             </div>
           </div>
         </div>
@@ -681,9 +678,27 @@ select:focus {
       versionDisplay.style.cssText = `
         position: fixed; bottom: 10px; left: 10px; z-index: 1000;
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
-        border-radius: 15px; font-size: 10px; opacity: 0.5;
+        border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
+        transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.2.9';
+      versionDisplay.textContent = 'v2.3.0';
+      
+      // Make version button clickable for PWA users
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isStandalone) {
+        versionDisplay.onclick = () => {
+          showUnifiedUpdateBanner();
+        };
+        versionDisplay.title = 'Tap to check for updates';
+        
+        // Add hover effect for better UX
+        versionDisplay.addEventListener('mouseenter', () => {
+          versionDisplay.style.opacity = '0.8';
+        });
+        versionDisplay.addEventListener('mouseleave', () => {
+          versionDisplay.style.opacity = '0.5';
+        });
+      }
       
       document.body.appendChild(versionDisplay);
     }
