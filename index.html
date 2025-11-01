@@ -565,9 +565,20 @@ select:focus {
                   if (navigator.serviceWorker.controller) {
                     // Check if running as PWA/standalone app
                     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
                     
-                    if (isStandalone) {
-                      // Only show update notification for PWA/standalone apps
+                    // Debug logging
+                    console.log('Update detected:', {
+                      isStandalone,
+                      isIOS,
+                      userAgent: navigator.userAgent,
+                      displayMode: window.matchMedia('(display-mode: standalone)').matches,
+                      navigatorStandalone: window.navigator.standalone
+                    });
+                    
+                    // For iOS, always show update notification for testing
+                    if (isIOS || isStandalone) {
+                      console.log('Showing update notification for iOS/PWA');
                       showUpdateNotification(newWorker);
                     } else {
                       // Web browser - just log, no notification needed
@@ -698,7 +709,7 @@ select:focus {
         background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
         border-radius: 15px; font-size: 10px; opacity: 0.5;
       `;
-      versionDisplay.textContent = 'v2.2.3';
+      versionDisplay.textContent = 'v2.2.4';
       
       document.body.appendChild(versionDisplay);
     }

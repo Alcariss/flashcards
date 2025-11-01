@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.3'; // Removed SW completion messages
-const APP_VERSION = '2.2.3'; // Removed SW completion messages
+const CACHE_NAME = 'flashcards-v3.4'; // Debug iOS standalone detection
+const APP_VERSION = '2.2.4'; // Debug iOS standalone detection
 const urlsToCache = [
   './',
   './index.html',
