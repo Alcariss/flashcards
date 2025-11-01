@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v3.1'; // PWA-only update notifications
-const APP_VERSION = '2.2.1'; // PWA-only update notifications
+const CACHE_NAME = 'flashcards-v3.2'; // Removed completion banner
+const APP_VERSION = '2.2.2'; // Removed completion banner
 const urlsToCache = [
   './',
   './index.html',
