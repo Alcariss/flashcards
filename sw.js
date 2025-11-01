@@ -1,4 +1,5 @@
-const CACHE_NAME = 'flashcards-v1';
+const CACHE_NAME = 'flashcards-v2'; // Increment version for updates
+const APP_VERSION = '2.0.0'; // App version for update detection
 const urlsToCache = [
   './',
   './index.html',
@@ -15,6 +16,7 @@ const isStandalone = () => {
 
 // Install event - cache resources
 self.addEventListener('install', event => {
+  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -26,6 +28,7 @@ self.addEventListener('install', event => {
       })
   );
   // Force the waiting service worker to become the active service worker
+  // This is more aggressive for iOS
   self.skipWaiting();
 });
 
@@ -70,7 +73,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and handle updates
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -85,6 +88,32 @@ self.addEventListener('activate', event => {
     }).then(() => {
       // Claim all clients immediately
       return self.clients.claim();
+    }).then(() => {
+      // Notify clients about the update
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'APP_UPDATED',
+            version: APP_VERSION,
+            message: 'App has been updated to the latest version!'
+          });
+        });
+      });
     })
   );
+});
+
+// Handle messages from main app
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'GET_VERSION') {
+    event.ports[0].postMessage({
+      type: 'VERSION_INFO',
+      version: APP_VERSION,
+      cacheName: CACHE_NAME
+    });
+  }
 });
