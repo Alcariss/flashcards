@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.2'; // Silent background updates
-const APP_VERSION = '2.3.2'; // Silent background updates
+const CACHE_NAME = 'flashcards-v4.3'; // UI update: Fruits → Fruit
+const APP_VERSION = '2.3.3'; // UI update: Fruits → Fruit
 const urlsToCache = [
   './',
   './index.html',
