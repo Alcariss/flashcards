@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flashcards</title>
   
+  <!-- Cache Control Headers for PWA Updates -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#007BFF">
   <meta name="description" content="Interactive flashcards for learning fruits, vegetables, animals and more">
@@ -675,7 +680,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.3.3
+              ${platformText} • Current: v2.3.4
             </div>
           </div>
         </div>
@@ -749,7 +754,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.3.3';
+      versionDisplay.textContent = 'v2.3.4';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
