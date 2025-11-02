@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.4'; // Added no-cache headers
-const APP_VERSION = '2.3.4'; // Added no-cache headers
+const CACHE_NAME = 'flashcards-v4.5'; // UI update: Vegetables → Vegetable
+const APP_VERSION = '2.3.5'; // UI update: Vegetables → Vegetable
 const urlsToCache = [
   './',
   './index.html',
