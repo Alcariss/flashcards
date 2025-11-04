@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.7'; // Added refresh button
-const APP_VERSION = '2.3.7'; // Added refresh button
+const CACHE_NAME = 'flashcards-v5.0'; // Fixed button highlighting after click
+const APP_VERSION = '2.4.0'; // Fixed button highlighting after click
 const urlsToCache = [
   './',
   './index.html',

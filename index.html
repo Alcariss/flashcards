@@ -74,7 +74,8 @@ h1 {
 .controls {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 10px;
   margin: 20px;
 }
@@ -95,22 +96,50 @@ button:hover {
 }
 
 #refreshBtn {
-  padding: 8px 12px;
-  font-size: 18px;
-  min-width: 40px;
-  height: 40px;
+  padding: 12px 16px;
+  font-size: 16px;
+  min-width: 48px;
+  height: 48px;
+  border: 2px solid #007BFF;
   border-radius: 8px;
-  background-color: #28a745;
+  background-color: white;
+  color: #007BFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 10px;
+  margin-left: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
 }
 
 #refreshBtn:hover {
-  background-color: #218838;
-  transform: rotate(180deg);
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  border-color: #0056b3;
+  background-color: #f8f9fa;
+  color: #0056b3;
+}
+
+#refreshBtn:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+#refreshBtn:active {
+  background-color: #e9ecef;
+  border-color: #0056b3;
+}
+
+#refreshBtn:focus:not(:focus-visible) {
+  border-color: #007BFF;
+  box-shadow: none;
+  background-color: white;
+}
+
+#refreshBtn:blur {
+  border-color: #007BFF;
+  background-color: white;
+  box-shadow: none;
 }
 
 /* Dropdown select styling */
@@ -210,14 +239,20 @@ select:focus {
 /* Responsive styles */
 @media (max-width: 768px) {
   .controls {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
   select {
-    width: 100%;
-    max-width: 300px;
+    flex: 1;
+    max-width: 250px;
     font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  #refreshBtn {
+    flex-shrink: 0;
   }
 
   .grid {
@@ -529,6 +564,12 @@ select:focus {
     const generateNewSet = () => {
       console.log('Generating new set for category:', selectedCategory);
       createFlashcards();
+      
+      // Remove focus from button to prevent persistent highlighting
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.blur();
+      }
     };
 
     // Event listeners
@@ -722,7 +763,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.3.7
+              ${platformText} • Current: v2.4.0
             </div>
           </div>
         </div>
@@ -796,7 +837,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.3.7';
+      versionDisplay.textContent = 'v2.4.0';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
