@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.6'; // Added House category
-const APP_VERSION = '2.3.6'; // Added House category
+const CACHE_NAME = 'flashcards-v4.7'; // Added refresh button
+const APP_VERSION = '2.3.7'; // Added refresh button
 const urlsToCache = [
   './',
   './index.html',

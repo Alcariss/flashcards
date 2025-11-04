@@ -94,6 +94,25 @@ button:hover {
   background-color: #0056b3;
 }
 
+#refreshBtn {
+  padding: 8px 12px;
+  font-size: 18px;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #28a745;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+#refreshBtn:hover {
+  background-color: #218838;
+  transform: rotate(180deg);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
 /* Dropdown select styling */
 select {
   padding: 12px 20px;
@@ -266,6 +285,9 @@ select:focus {
       <option value="halloween">🎃 Halloween</option>
       <option value="house">House</option>
     </select>
+    <button id="refreshBtn" onclick="generateNewSet()" title="Generate new set of cards">
+      ↻
+    </button>
   </div>
 
   <div class="grid"></div>
@@ -503,6 +525,12 @@ select:focus {
       items.forEach(item => grid.appendChild(createFlashcard(item)));
     };
 
+    // Generate new set of cards for current category
+    const generateNewSet = () => {
+      console.log('Generating new set for category:', selectedCategory);
+      createFlashcards();
+    };
+
     // Event listeners
     const categorySelect = document.getElementById('categorySelect');
     categorySelect.addEventListener('change', (e) => {
@@ -694,7 +722,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.3.6
+              ${platformText} • Current: v2.3.7
             </div>
           </div>
         </div>
@@ -768,7 +796,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.3.6';
+      versionDisplay.textContent = 'v2.3.7';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
