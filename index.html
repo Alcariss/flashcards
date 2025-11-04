@@ -264,6 +264,7 @@ select:focus {
       <option value="sports">⚽ Sports</option>
       <option value="clothing">👕 Clothing</option>
       <option value="halloween">🎃 Halloween</option>
+      <option value="house">House</option>
     </select>
   </div>
 
@@ -434,6 +435,19 @@ select:focus {
         { name: "Magic Wand", emoji: "🪄" },
         { name: "Tombstone", emoji: "🪦" },
         { name: "Candle", emoji: "🕯️" }
+      ],
+      house: [
+       { name: "Bathroom", emoji: "🛀" },
+       { name: "Toilet", emoji: "🧻" },
+       { name: "Living room", emoji: "🛋️" },
+       { name: "Chair", emoji: "🪑" },
+       { name: "Fire", emoji: "🔥" },
+       { name: "Shower", emoji: "🚿" },
+       { name: "Window", emoji: "🪟" },
+       { name: "Door", emoji: "🚪" },
+       { name: "Soap", emoji: "🧼" },
+       { name: "Toothbrush", emoji: "🪥" },
+       { name: "Bedroom", emoji: "🛏️" } // Empty array - user will add their own words
       ]
     };
 
@@ -680,7 +694,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.3.5
+              ${platformText} • Current: v2.3.6
             </div>
           </div>
         </div>
@@ -754,7 +768,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.3.5';
+      versionDisplay.textContent = 'v2.3.6';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;

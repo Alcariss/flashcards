@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v4.5'; // UI update: Vegetables → Vegetable
-const APP_VERSION = '2.3.5'; // UI update: Vegetables → Vegetable
+const CACHE_NAME = 'flashcards-v4.6'; // Added House category
+const APP_VERSION = '2.3.6'; // Added House category
 const urlsToCache = [
   './',
   './index.html',
