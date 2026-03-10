@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards</title>
+  
+  <!-- Cache Control Headers for PWA Updates -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#007BFF">
+  <meta name="description" content="Interactive flashcards for learning fruits, vegetables, animals and more">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Flashcards">
+  
+  <!-- iOS Icons - Multiple Sizes -->
+  <link rel="apple-touch-icon" sizes="57x57" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+  
+  <!-- iOS Splash Screens -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="icon-512.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+  
+  <!-- Fallback for older browsers -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  
+  <style>
+/* General styles for the page */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  /* iOS-specific: Prevent bounce scrolling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* iOS-specific: Prevent text selection */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iOS-specific: Fix viewport issues */
+@supports (-webkit-touch-callout: none) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+h1 {
+  margin: 20px 0;
+  font-size: 28px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007BFF;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#refreshBtn {
+  padding: 12px 16px;
+  font-size: 16px;
+  min-width: 48px;
+  height: 48px;
+  border: 2px solid #007BFF;
+  border-radius: 8px;
+  background-color: white;
+  color: #007BFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+#refreshBtn:hover {
+  border-color: #0056b3;
+  background-color: #f8f9fa;
+  color: #0056b3;
+}
+
+#refreshBtn:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+#refreshBtn:active {
+  background-color: #e9ecef;
+  border-color: #0056b3;
+}
+
+#refreshBtn:focus:not(:focus-visible) {
+  border-color: #007BFF;
+  box-shadow: none;
+  background-color: white;
+}
+
+#refreshBtn:blur {
+  border-color: #007BFF;
+  background-color: white;
+  box-shadow: none;
+}
+
+/* Dropdown select styling */
+select {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 2px solid #007BFF;
+  border-radius: 8px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  min-width: 200px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007BFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 45px;
+}
+
+select:hover {
+  border-color: #0056b3;
+  background-color: #f8f9fa;
+}
+
+select:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+#refreshButton {
+  background-color: #2196F3;
+}
+
+#refreshButton:hover {
+  background-color: #0b7dda;
+}
+
+/* Grid layout for flashcards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 600px;
+  aspect-ratio: 1; /* Makes the grid container square */
+}
+
+/* Flashcard container */
+.flashcard {
+  width: 100%;
+  aspect-ratio: 1; /* Makes each card square */
+  perspective: 1000px;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  cursor: pointer;
+}
+
+.flashcard.flip .inner {
+  transform: rotateY(180deg);
+}
+
+/* Front and back of the flashcard */
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.front {
+  background-color: #f2f2f2;
+  font-size: 4rem; /* Large emoji size - 64px */
+}
+
+.back {
+  background-color: #4CAF50;
+  color: white;
+  transform: rotateY(180deg);
+  font-size: 24px; /* Keep text size as original */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  select {
+    flex: 1;
+    max-width: 250px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  #refreshBtn {
+    flex-shrink: 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 10px;
+    max-width: 400px;
+  }
+
+  .flashcard {
+    aspect-ratio: 1; /* Keep cards square */
+  }
+
+  .front {
+    font-size: 3rem; /* 48px for tablets */
+  }
+
+  .back {
+    font-size: 20px; /* Keep text size as original */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 10px 16px;
+    max-width: 280px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 300px;
+  }
+
+  .flashcard {
+    aspect-ratio: 1; /* Keep cards square */
+  }
+
+  .front {
+    font-size: 2.5rem; /* 40px for mobile */
+  }
+
+  .back {
+    font-size: 16px; /* Keep text size as original */
+  }
+}
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <select id="categorySelect">
+      <option value="fruits">🍎 Fruit</option>
+      <option value="vegetables">🥕 Vegetable</option>
+      <option value="vehicles">🚗 Vehicles</option>
+      <option value="animals">🐶 Animals</option>
+      <option value="sports">⚽ Sports</option>
+      <option value="clothing">👕 Clothing</option>
+      <option value="halloween">🎃 Halloween</option>
+      <option value="house">House</option>
+      <option value="feelings">Feelings</option>
+    </select>
+    <button id="refreshBtn" onclick="generateNewSet()" title="Generate new set of cards">
+      ↻
+    </button>
+  </div>
+
+  <div class="grid"></div>
+
+  <script>
+    // Categories data
+    const categories = {
+      fruits: [
+        { name: "Apple", emoji: "🍎" },
+        { name: "Banana", emoji: "🍌" },
+        { name: "Cherry", emoji: "🍒" },
+        { name: "Grape", emoji: "🍇" },
+        { name: "Lemon", emoji: "🍋" },
+        { name: "Mango", emoji: "🥭" },
+        { name: "Orange", emoji: "🍊" },
+        { name: "Peach", emoji: "🍑" },
+        { name: "Pear", emoji: "🍐" },
+        { name: "Pineapple", emoji: "🍍" },
+        { name: "Strawberry", emoji: "🍓" },
+        { name: "Watermelon", emoji: "🍉" },
+        { name: "Kiwi", emoji: "🥝" },
+        { name: "Blueberry", emoji: "🫐" },
+        { name: "Coconut", emoji: "🥥" },
+        { name: "Avocado", emoji: "🥑" },
+        { name: "Tangerine", emoji: "🍊" }
+      ],
+      vegetables: [
+        { name: "Carrot", emoji: "🥕" },
+        { name: "Broccoli", emoji: "🥦" },
+        { name: "Potato", emoji: "🥔" },
+        { name: "Tomato", emoji: "🍅" },
+        { name: "Cucumber", emoji: "🥒" },
+        { name: "Onion", emoji: "🧅" },
+        { name: "Garlic", emoji: "🧄" },
+        { name: "Eggplant", emoji: "🍆" },
+        { name: "Pepper", emoji: "🌶️" },
+        { name: "Lettuce", emoji: "🥬" },
+        { name: "Corn", emoji: "🌽" },
+        { name: "Mushroom", emoji: "🍄" },
+        { name: "Zucchini", emoji: "🥒" },
+        { name: "Spinach", emoji: "🍃" },
+        { name: "Asparagus", emoji: "🌿" }
+      ],
+      vehicles: [
+        { name: "Car", emoji: "🚗" },
+        { name: "Bus", emoji: "🚌" },
+        { name: "Bicycle", emoji: "🚲" },
+        { name: "Motorcycle", emoji: "🏍️" },
+        { name: "Truck", emoji: "🚚" },
+        { name: "Airplane", emoji: "✈️" },
+        { name: "Boat", emoji: "⛴️" },
+        { name: "Helicopter", emoji: "🚁" },
+        { name: "Train", emoji: "🚆" },
+        { name: "Tram", emoji: "🚋" },
+        { name: "Scooter", emoji: "🛴" },
+        { name: "Rocket", emoji: "🚀" },
+        { name: "Taxi", emoji: "🚖" },
+        { name: "Ship", emoji: "🚢" },
+        { name: "Submarine", emoji: "🛳️" }
+      ],
+      animals: [
+        { name: "Dog", emoji: "🐶" },
+        { name: "Cat", emoji: "🐱" },
+        { name: "Mouse", emoji: "🐭" },
+        { name: "Hamster", emoji: "🐹" },
+        { name: "Rabbit", emoji: "🐰" },
+        { name: "Fox", emoji: "🦊" },
+        { name: "Bear", emoji: "🐻" },
+        { name: "Panda", emoji: "🐼" },
+        { name: "Koala", emoji: "🐨" },
+        { name: "Tiger", emoji: "🐯" },
+        { name: "Lion", emoji: "🦁" },
+        { name: "Cow", emoji: "🐮" },
+        { name: "Pig", emoji: "🐷" },
+        { name: "Frog", emoji: "🐸" },
+        { name: "Monkey", emoji: "🐵" },
+        { name: "Chicken", emoji: "🐔" },
+        { name: "Penguin", emoji: "🐧" },
+        { name: "Bird", emoji: "🐦" },
+        { name: "Baby Chick", emoji: "🐤" },
+        { name: "Hatching Chick", emoji: "🐣" },
+        { name: "Duck", emoji: "🦆" },
+        { name: "Eagle", emoji: "🦅" },
+        { name: "Owl", emoji: "🦉" },
+        { name: "Bat", emoji: "🦇" },
+        { name: "Wolf", emoji: "🐺" },
+        { name: "Horse", emoji: "🐴" },
+        { name: "Unicorn", emoji: "🦄" },
+        { name: "Bee", emoji: "🐝" },
+        { name: "Caterpillar", emoji: "🐛" },
+        { name: "Butterfly", emoji: "🦋" },
+        { name: "Snail", emoji: "🐌" },
+        { name: "Lady Beetle", emoji: "🐞" },
+        { name: "Ant", emoji: "🐜" },
+        { name: "Spider", emoji: "🕷️" },
+        { name: "Scorpion", emoji: "🦂" },
+        { name: "Crab", emoji: "🦀" },
+        { name: "Lobster", emoji: "🦞" },
+        { name: "Shrimp", emoji: "🦐" },
+        { name: "Squid", emoji: "🦑" },
+        { name: "Octopus", emoji: "🐙" },
+        { name: "Fish", emoji: "🐟" },
+        { name: "Tropical Fish", emoji: "🐠" },
+        { name: "Blowfish", emoji: "🐡" },
+        { name: "Shark", emoji: "🦈" },
+        { name: "Whale", emoji: "🐳" },
+        { name: "Dolphin", emoji: "🐬" },
+        { name: "Crocodile", emoji: "🐊" },
+        { name: "Turtle", emoji: "🐢" },
+        { name: "Lizard", emoji: "🦎" },
+        { name: "Snake", emoji: "🐍" },
+        { name: "Dragon", emoji: "🐉" },
+        { name: "Sauropod", emoji: "🦕" },
+        { name: "T-Rex", emoji: "🦖" }
+      ],
+      sports: [
+        { name: "playing football", emoji: "⚽️" },
+        { name: "playing basketball", emoji: "🏀" },
+        { name: "rollerblading", emoji: "🛼" },
+        { name: "swimming", emoji: "🏊‍♀️" },
+        { name: "skateboarding", emoji: "🛹" },
+        { name: "flying a kite", emoji: "🪁" },
+        { name: "riding a bike", emoji: "🚲" },
+        { name: "bouncing", emoji: "⛹" },
+        { name: "throwing a ball", emoji: "🤽‍♀️" },
+        { name: "playing baseball", emoji: "🥎" }
+      ],
+      clothing: [
+        { name: "T-Shirt", emoji: "👕" },
+        { name: "dress", emoji: "👗" },
+        { name: "trousers", emoji: "👖" },
+        { name: "coat", emoji: "🧥" },
+        { name: "socks", emoji: "🧦" },
+        { name: "boots", emoji: "👢" },
+        { name: "shoes", emoji: "👟" },
+        { name: "swimming costume", emoji: "👙" },
+        { name: "gloves", emoji: "🧤" },
+        { name: "hat", emoji: "🧢" },
+        { name: "shorts", emoji: "🩳" },
+        { name: "bag", emoji: "🎒" },
+        { name: "sunglasses", emoji: "🕶️" },
+        { name: "umbrella", emoji: "☂️" }
+      ],
+      halloween: [
+        { name: "Ghost", emoji: "👻" },
+        { name: "Pumpkin", emoji: "🎃" },
+        { name: "Witch", emoji: "🧙‍♀️" },
+        { name: "Vampire", emoji: "🧛‍♂️" },
+        { name: "Zombie", emoji: "🧟‍♂️" },
+        { name: "Skeleton", emoji: "💀" },
+        { name: "Fairy", emoji: "🧚‍♀️" },
+        { name: "Spider", emoji: "🕷️" },
+        { name: "Bat", emoji: "🦇" },
+        { name: "Black Cat", emoji: "🐱‍👤" },
+        { name: "Witch Hat", emoji: "🧙‍♀️" },
+        { name: "Crystal Ball", emoji: "🔮" },
+        { name: "Cauldron", emoji: "🧪" },
+        { name: "Candy", emoji: "🍬" },
+        { name: "Lollipop", emoji: "🍭" },
+        { name: "Chocolate", emoji: "🍫" },
+        { name: "Jack-o'-lantern", emoji: "🎃" },
+        { name: "Haunted House", emoji: "🏚️" },
+        { name: "Full Moon", emoji: "🌕" },
+        { name: "Coffin", emoji: "⚰️" },
+        { name: "Skull", emoji: "💀" },
+        { name: "Potion", emoji: "🧪" },
+        { name: "Magic Wand", emoji: "🪄" },
+        { name: "Tombstone", emoji: "🪦" },
+        { name: "Candle", emoji: "🕯️" }
+      ],
+      house: [
+       { name: "Bathroom", emoji: "🛀" },
+       { name: "Toilet", emoji: "🧻" },
+       { name: "Living room", emoji: "🛋️" },
+       { name: "Chair", emoji: "🪑" },
+       { name: "Fire", emoji: "🔥" },
+       { name: "Shower", emoji: "🚿" },
+       { name: "Window", emoji: "🪟" },
+       { name: "Door", emoji: "🚪" },
+       { name: "Soap", emoji: "🧼" },
+       { name: "Toothbrush", emoji: "🪥" },
+       { name: "Bedroom", emoji: "🛏️" } // Empty array - user will add their own words
+      ],
+      feelings: [
+       { name: "Tired", emoji: "😴 unaveny" },
+       { name: "Scared", emoji: "😨 vydeseny" },
+       { name: "Angry", emoji: "😡 rozzlobeny" },
+       { name: "Hungry", emoji: "🍕 hladovy" },
+       { name: "Thirsty", emoji: "💧 ziznivy" },
+       { name: "Bored", emoji: "🥱 znudeny" },
+       { name: "Worried", emoji: "😬 ustarany" },
+       { name: "Surprised", emoji: "😮 prekvapeny" },
+       { name: "Silly", emoji: "🤪 prasteny" },
+       { name: "Sad", emoji: "😢 smutny" },
+       { name: "Excited", emoji: "🥳 nadseny" },
+       { name: "Happy", emoji: "😀 stastny" }
+        // Empty array - user will add their own words
+      ]
+    };
+
+    // State
+    let selectedCategory = 'fruits';
+    const grid = document.querySelector('.grid');
+
+    // Utility functions
+    const shuffleArray = (arr) => {
+      const shuffled = [...arr];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    const pronounce = (text) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-UK';
+      speechSynthesis.speak(utterance);
+    };
+
+    const createFlashcard = (item) => {
+      const card = document.createElement('div');
+      card.className = 'flashcard';
+      card.innerHTML = `
+        <div class="inner">
+          <div class="front">${item.emoji}</div>
+          <div class="back">${item.name}</div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        const isFlipped = card.classList.contains('flip');
+        
+        if (!isFlipped) {
+          // Card is showing emoji (front), pronounce and flip to text
+          pronounce(item.name);
+          card.classList.add('flip');
+        } else {
+          // Card is showing text (back), just flip back to emoji without pronouncing
+          card.classList.remove('flip');
+        }
+      });
+
+      return card;
+    };
+
+    const createFlashcards = () => {
+      grid.innerHTML = '';
+      const items = shuffleArray(categories[selectedCategory]).slice(0, 9);
+      items.forEach(item => grid.appendChild(createFlashcard(item)));
+    };
+
+    // Generate new set of cards for current category
+    const generateNewSet = () => {
+      console.log('Generating new set for category:', selectedCategory);
+      createFlashcards();
+      
+      // Remove focus from button to prevent persistent highlighting
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.blur();
+      }
+    };
+
+    // Event listeners
+    const categorySelect = document.getElementById('categorySelect');
+    categorySelect.addEventListener('change', (e) => {
+      selectedCategory = e.target.value;
+      createFlashcards();
+    });
+
+    // Initialize
+    createFlashcards();
+
+    // iOS Detection and PWA Features
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    
+    // iOS-specific install prompt (since beforeinstallprompt doesn't work on iOS)
+    if (isIOS && !isStandalone) {
+      const iosInstallBtn = document.createElement('div');
+      iosInstallBtn.innerHTML = `
+        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                    background: #007BFF; color: white; padding: 15px 20px; border-radius: 10px; 
+                    font-size: 14px; z-index: 1000; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          📱 Install this app: Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>
+          <button onclick="this.parentElement.parentElement.remove()" 
+                  style="background: none; border: none; color: white; font-size: 18px; float: right; cursor: pointer;">×</button>
+        </div>
+      `;
+      document.body.appendChild(iosInstallBtn);
+      
+      // Auto-hide after 10 seconds
+      setTimeout(() => {
+        if (iosInstallBtn.parentElement) {
+          iosInstallBtn.remove();
+        }
+      }, 10000);
+    }
+
+    // iOS PWA updates now work automatically via service worker
+
+    // PWA Install Prompt (for Android/Desktop)
+    let deferredPrompt;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      deferredPrompt = e;
+      
+      // Show install button
+      const installBtn = document.createElement('button');
+      installBtn.textContent = '📱 Install App';
+      installBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 14px;';
+      installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          deferredPrompt = null;
+          installBtn.remove();
+        });
+      });
+      document.body.appendChild(installBtn);
+    });
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('SW registered successfully:', registration.scope);
+            
+            // Cross-platform automatic update detection
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            
+            if (isStandalone) {
+              console.log('PWA detected - enabling automatic and manual updates');
+              
+              // Set up automatic update detection
+              setupAutomaticUpdates(registration);
+              
+              // Set up periodic background checks
+              setupPeriodicUpdateChecks(registration);
+            } else {
+              console.log('Running in browser - manual updates only');
+            }
+          })
+          .catch(registrationError => {
+            console.error('SW registration failed:', registrationError);
+          });
+      });
+    } else {
+      console.log('Service workers are not supported');
+    }
+
+    // Automatic update detection system
+    function setupAutomaticUpdates(registration) {
+      // Listen for service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('New service worker detected - installing silently in background');
+        
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('New version available - applying update silently');
+              applySilentUpdate(newWorker);
+            }
+          });
+        }
+      });
+      
+      // Listen for controller changes (when new SW takes control)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('Service worker updated successfully in background');
+      });
+    }
+
+    // Periodic background update checks
+    function setupPeriodicUpdateChecks(registration) {
+      // Check for updates every 30 minutes
+      const checkInterval = 30 * 60 * 1000; // 30 minutes
+      
+      const performUpdateCheck = () => {
+        console.log('Performing background update check...');
+        registration.update().catch(error => {
+          console.error('Background update check failed:', error);
+        });
+      };
+      
+      // Initial check after 2 minutes
+      setTimeout(performUpdateCheck, 2 * 60 * 1000);
+      
+      // Then check every 30 minutes
+      setInterval(performUpdateCheck, checkInterval);
+      
+      // Also check when app becomes visible (user returns to app)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          console.log('App became visible - checking for updates');
+          setTimeout(performUpdateCheck, 1000);
+        }
+      });
+    }
+
+    // Apply silent background update (no user interface)
+    function applySilentUpdate(newWorker) {
+      console.log('Applying silent background update...');
+      
+      // Tell the new service worker to skip waiting and become active
+      newWorker.postMessage({ type: 'SKIP_WAITING' });
+      
+      // The new service worker will take control automatically
+      // No reload needed - users will get new content on next navigation
+      // This keeps the app running smoothly without interruption
+    }
+
+    // Show unified update banner (manual trigger via version button only)
+    function showUnifiedUpdateBanner() {
+      // Check if notification already exists
+      const existingBanner = document.getElementById('update-banner');
+      if (existingBanner) {
+        existingBanner.remove();
+      }
+      
+      const updateBanner = document.createElement('div');
+      updateBanner.id = 'update-banner';
+      
+      // Detect platform for appropriate messaging
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const platformIcon = isIOS ? '🍎' : '📱';
+      const platformText = isIOS ? 'iOS App' : 'PWA';
+      
+      updateBanner.innerHTML = `
+        <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #28a745; color: white; 
+                    padding: 15px; text-align: center; z-index: 10000; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
+          <div style="max-width: 600px; margin: 0 auto;">
+            <strong>${platformIcon} Check for Updates</strong><br>
+            <span style="font-size: 14px;">Tap to check for the latest version and improvements.</span><br>
+            <div style="margin-top: 10px;">
+              <button onclick="forceUpdate()" 
+                      style="background: white; color: #28a745; border: none; padding: 10px 20px; 
+                             border-radius: 8px; margin: 0 5px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                🔄 Check & Update
+              </button>
+              <button onclick="dismissUpdate()" 
+                      style="background: transparent; color: white; border: 2px solid white; 
+                             padding: 8px 16px; border-radius: 8px; margin: 0 5px; cursor: pointer; font-size: 14px;">
+                Not Now
+              </button>
+            </div>
+            <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
+              ${platformText} • Current: v2.4.0
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(updateBanner);
+    }
+
+    // Force update function - works reliably on all platforms (manual trigger)
+    window.forceUpdate = function() {
+      // Show immediate feedback
+      const updateBtn = document.querySelector('button[onclick="forceUpdate()"]');
+      if (updateBtn) {
+        updateBtn.innerHTML = '🔄 Updating...';
+        updateBtn.style.background = '#ccc';
+        updateBtn.style.color = '#666';
+        updateBtn.disabled = true;
+      }
+      
+      // Update the banner message
+      const banner = document.getElementById('update-banner');
+      if (banner) {
+        const messageDiv = banner.querySelector('div > div');
+        if (messageDiv) {
+          messageDiv.innerHTML = `
+            <strong>🔄 Checking for Updates...</strong><br>
+            <span style="font-size: 14px;">Refreshing app content, please wait...</span>
+          `;
+        }
+      }
+      
+      console.log('Force updating PWA...');
+      
+      // Clear all caches and force reload
+      if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+          console.log('Clearing caches:', cacheNames);
+          return Promise.all(
+            cacheNames.map(cacheName => caches.delete(cacheName))
+          );
+        }).then(() => {
+          console.log('All caches cleared, reloading...');
+          // Force reload from server, bypassing all caches
+          window.location.reload(true);
+        }).catch(error => {
+          console.error('Cache clearing failed:', error);
+          // Fallback: just force reload
+          window.location.reload(true);
+        });
+      } else {
+        // No cache API, just force reload
+        console.log('No cache API, force reloading...');
+        window.location.reload(true);
+      }
+    };
+
+    // Dismiss update notification
+    window.dismissUpdate = function() {
+      const banner = document.getElementById('update-banner');
+      if (banner) {
+        banner.remove();
+      }
+    };
+
+    // Add version display for troubleshooting
+    function addVersionDisplay() {
+      const versionDisplay = document.createElement('div');
+      versionDisplay.style.cssText = `
+        position: fixed; bottom: 10px; left: 10px; z-index: 1000;
+        background: rgba(0,0,0,0.7); color: white; padding: 5px 10px;
+        border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
+        transition: opacity 0.3s ease;
+      `;
+      versionDisplay.textContent = 'v2.4.0';
+      
+      // Make version button clickable for PWA users
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isStandalone) {
+        versionDisplay.onclick = () => {
+          showUnifiedUpdateBanner();
+        };
+        versionDisplay.title = 'Tap to check for updates';
+        
+        // Add hover effect for better UX
+        versionDisplay.addEventListener('mouseenter', () => {
+          versionDisplay.style.opacity = '0.8';
+        });
+        versionDisplay.addEventListener('mouseleave', () => {
+          versionDisplay.style.opacity = '0.5';
+        });
+      }
+      
+      document.body.appendChild(versionDisplay);
+    }
+
+    // Add version display
+    setTimeout(addVersionDisplay, 1000);
+  </script>
+</body>
+</html>
