@@ -119,19 +119,12 @@
   
   <div id="container"></div>
   
+  <!-- Import shared utilities -->
+  <script src="app.js"></script>
   <script>
     const container = document.getElementById('container');
     const summary = document.getElementById('summary');
     const overflowErrors = [];
-    
-    // Parse emoji + text from emoji field
-    const parseEmoji = (emojiStr) => {
-      const match = emojiStr.match(/^(\p{Emoji}[\p{Emoji}\uFE0F\u200D]*)\s*(.*)$/u);
-      if (match && match[2]) {
-        return { emoji: match[1], text: match[2] };
-      }
-      return { emoji: emojiStr, text: null };
-    };
     
     // Check if element content overflows
     const checkOverflow = (element) => {
@@ -139,7 +132,7 @@
              element.scrollHeight > element.clientHeight;
     };
     
-    // Create a card element
+    // Create a card element (uses parseEmoji from app.js)
     const createCard = (item, categoryKey) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'card-wrapper';

@@ -1,10 +1,12 @@
-const CACHE_NAME = 'flashcards-v5.9'; // Feelings layout fix
-const APP_VERSION = '2.7.1'; // Feelings layout fix
+const CACHE_NAME = 'flashcards-v6.0'; // Shared styles refactor
+const APP_VERSION = '2.8.0'; // Shared styles refactor
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './categories.json',
+  './styles.css',
+  './app.js',
   './icon-192.png',
   './icon-512.png'
 ];
