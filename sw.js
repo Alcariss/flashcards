@@ -1,9 +1,10 @@
-const CACHE_NAME = 'flashcards-v5.7'; // Unified categories structure
-const APP_VERSION = '2.6.5'; // Unified categories structure
+const CACHE_NAME = 'flashcards-v5.8'; // Externalize categories data
+const APP_VERSION = '2.7.0'; // Externalize categories data
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+  './categories.json',
   './icon-192.png',
   './icon-512.png'
 ];
