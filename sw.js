@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v5.8'; // Externalize categories data
-const APP_VERSION = '2.7.0'; // Externalize categories data
+const CACHE_NAME = 'flashcards-v5.9'; // Feelings layout fix
+const APP_VERSION = '2.7.1'; // Feelings layout fix
 const urlsToCache = [
   './',
   './index.html',
