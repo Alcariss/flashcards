@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Overflow Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; }
+    
+    h1 { margin-bottom: 20px; }
+    
+    .summary {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      z-index: 100;
+    }
+    
+    .summary.has-errors { border-color: #f44336; background: #ffebee; }
+    .summary.all-good { border-color: #4CAF50; background: #e8f5e9; }
+    
+    .category-section {
+      margin-bottom: 30px;
+    }
+    
+    .category-title {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    
+    .card {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #f2f2f2;
+      font-size: 3rem;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .card.overflow {
+      border-color: #f44336;
+      background: #ffebee;
+    }
+    
+    .card.overflow::after {
+      content: '⚠️ OVERFLOW';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #f44336;
+      color: white;
+      font-size: 8px;
+      text-align: center;
+      padding: 2px;
+    }
+    
+    .emoji-text {
+      display: block;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+    
+    .card-label {
+      font-size: 10px;
+      color: #666;
+      margin-top: 5px;
+      text-align: center;
+      word-break: break-word;
+    }
+    
+    .card-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .error-list {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .error-item {
+      padding: 5px;
+      margin: 2px 0;
+      background: #ffcdd2;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Card Overflow Test</h1>
+  
+  <div class="summary" id="summary">
+    <strong>Loading...</strong>
+  </div>
+  
+  <div id="container"></div>
+  
+  <script>
+    const container = document.getElementById('container');
+    const summary = document.getElementById('summary');
+    const overflowErrors = [];
+    
+    // Parse emoji + text from emoji field
+    const parseEmoji = (emojiStr) => {
+      const match = emojiStr.match(/^(\p{Emoji}[\p{Emoji}\uFE0F\u200D]*)\s*(.*)$/u);
+      if (match && match[2]) {
+        return { emoji: match[1], text: match[2] };
+      }
+      return { emoji: emojiStr, text: null };
+    };
+    
+    // Check if element content overflows
+    const checkOverflow = (element) => {
+      return element.scrollWidth > element.clientWidth || 
+             element.scrollHeight > element.clientHeight;
+    };
+    
+    // Create a card element
+    const createCard = (item, categoryKey) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'card-wrapper';
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const { emoji, text } = parseEmoji(item.emoji);
+      
+      if (text) {
+        card.innerHTML = `${emoji}<span class="emoji-text">${text}</span>`;
+      } else {
+        card.textContent = emoji;
+      }
+      
+      const label = document.createElement('div');
+      label.className = 'card-label';
+      label.textContent = item.name;
+      
+      wrapper.appendChild(card);
+      wrapper.appendChild(label);
+      
+      // Check overflow after render
+      requestAnimationFrame(() => {
+        if (checkOverflow(card)) {
+          card.classList.add('overflow');
+          overflowErrors.push({
+            category: categoryKey,
+            name: item.name,
+            emoji: item.emoji
+          });
+          updateSummary();
+        }
+      });
+      
+      return wrapper;
+    };
+    
+    // Update summary display
+    const updateSummary = () => {
+      if (overflowErrors.length === 0) {
+        summary.className = 'summary all-good';
+        summary.innerHTML = `<strong>✅ All cards render correctly!</strong> No overflow detected.`;
+      } else {
+        summary.className = 'summary has-errors';
+        summary.innerHTML = `
+          <strong>⚠️ ${overflowErrors.length} overflow issue(s) detected</strong>
+          <div class="error-list">
+            ${overflowErrors.map(e => `
+              <div class="error-item">
+                <strong>${e.category}</strong>: ${e.name} (${e.emoji})
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    };
+    
+    // Load and render all categories
+    const init = async () => {
+      try {
+        const response = await fetch('./categories.json');
+        const categories = await response.json();
+        
+        let totalCards = 0;
+        
+        for (const [key, category] of Object.entries(categories)) {
+          const section = document.createElement('div');
+          section.className = 'category-section';
+          
+          const title = document.createElement('h2');
+          title.className = 'category-title';
+          title.textContent = `${category.label} (${category.items.length} items)`;
+          section.appendChild(title);
+          
+          const grid = document.createElement('div');
+          grid.className = 'cards-grid';
+          
+          for (const item of category.items) {
+            grid.appendChild(createCard(item, key));
+            totalCards++;
+          }
+          
+          section.appendChild(grid);
+          container.appendChild(section);
+        }
+        
+        // Final summary update after all cards rendered
+        setTimeout(() => {
+          updateSummary();
+          const summaryText = summary.querySelector('strong');
+          if (overflowErrors.length === 0) {
+            summaryText.textContent = `✅ All ${totalCards} cards render correctly!`;
+          }
+        }, 100);
+        
+      } catch (error) {
+        summary.innerHTML = `<strong style="color: red;">Error loading categories: ${error.message}</strong>`;
+      }
+    };
+    
+    init();
+  </script>
+</body>
+</html>
