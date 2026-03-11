@@ -326,17 +326,7 @@ select:focus {
 
   <div class="controls">
     <select id="categorySelect">
-      <option value="fruits">🍎 Fruit</option>
-      <option value="vegetables">🥕 Vegetable</option>
-      <option value="vehicles">🚗 Vehicles</option>
-      <option value="animals">🐶 Animals</option>
-      <option value="sports">⚽ Sports</option>
-      <option value="clothing">👕 Clothing</option>
-      <option value="halloween">🎃 Halloween</option>
-      <option value="house">House</option>
-      <option value="feelings">Feelings</option>
-      <option value="exoticAnimals">Exotic Animals</option>
-      <option value="theWorldofWork">The World of Work</option>
+      <!-- Options populated dynamically from categoryMeta -->
     </select>
     <button id="refreshBtn" onclick="generateNewSet()" title="Generate new set of cards">
       ↻
@@ -346,6 +336,21 @@ select:focus {
   <div class="grid"></div>
 
   <script>
+    // Category metadata - single source of truth for display names
+    const categoryMeta = {
+      fruits: '🍎 Fruit',
+      vegetables: '🥕 Vegetable',
+      vehicles: '🚗 Vehicles',
+      animals: '🐶 Animals',
+      sports: '⚽ Sports',
+      clothing: '👕 Clothing',
+      halloween: '🎃 Halloween',
+      house: '🏠 House',
+      feelings: '😀 Feelings',
+      exoticAnimals: '🦒 Exotic Animals',
+      theWorldofWork: '💼 The World of Work'
+    };
+
     // Categories data
     const categories = {
       fruits: [
@@ -647,7 +652,15 @@ select:focus {
     };
 
     // Event listeners
+    // Populate category select from categoryMeta
     const categorySelect = document.getElementById('categorySelect');
+    Object.entries(categoryMeta).forEach(([key, label]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = label;
+      categorySelect.appendChild(option);
+    });
+
     categorySelect.addEventListener('change', (e) => {
       selectedCategory = e.target.value;
       createFlashcards();
@@ -837,7 +850,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.6.3
+              ${platformText} • Current: v2.6.4
             </div>
           </div>
         </div>
@@ -911,7 +924,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.6.3';
+      versionDisplay.textContent = 'v2.6.4';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;

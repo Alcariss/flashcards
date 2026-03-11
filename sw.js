@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v5.5'; // Feelings text size fix
-const APP_VERSION = '2.6.3'; // Feelings text size fix
+const CACHE_NAME = 'flashcards-v5.6'; // DRY category refactor
+const APP_VERSION = '2.6.4'; // DRY category refactor
 const urlsToCache = [
   './',
   './index.html',
