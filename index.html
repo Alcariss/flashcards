@@ -326,7 +326,7 @@ select:focus {
 
   <div class="controls">
     <select id="categorySelect">
-      <!-- Options populated dynamically from categoryMeta -->
+      <!-- Options populated dynamically from categories -->
     </select>
     <button id="refreshBtn" onclick="generateNewSet()" title="Generate new set of cards">
       ↻
@@ -336,24 +336,11 @@ select:focus {
   <div class="grid"></div>
 
   <script>
-    // Category metadata - single source of truth for display names
-    const categoryMeta = {
-      fruits: '🍎 Fruit',
-      vegetables: '🥕 Vegetable',
-      vehicles: '🚗 Vehicles',
-      animals: '🐶 Animals',
-      sports: '⚽ Sports',
-      clothing: '👕 Clothing',
-      halloween: '🎃 Halloween',
-      house: '🏠 House',
-      feelings: '😀 Feelings',
-      exoticAnimals: '🦒 Exotic Animals',
-      theWorldofWork: '💼 The World of Work'
-    };
-
-    // Categories data
+    // Categories data - single source of truth
     const categories = {
-      fruits: [
+      fruits: {
+        label: '🍎 Fruit',
+        items: [
         { name: "Apple", emoji: "🍎" },
         { name: "Banana", emoji: "🍌" },
         { name: "Cherry", emoji: "🍒" },
@@ -371,8 +358,10 @@ select:focus {
         { name: "Coconut", emoji: "🥥" },
         { name: "Avocado", emoji: "🥑" },
         { name: "Tangerine", emoji: "🍊" }
-      ],
-      vegetables: [
+      ]},
+      vegetables: {
+        label: '🥕 Vegetable',
+        items: [
         { name: "Carrot", emoji: "🥕" },
         { name: "Broccoli", emoji: "🥦" },
         { name: "Potato", emoji: "🥔" },
@@ -388,8 +377,10 @@ select:focus {
         { name: "Zucchini", emoji: "🥒" },
         { name: "Spinach", emoji: "🍃" },
         { name: "Asparagus", emoji: "🌿" }
-      ],
-      vehicles: [
+      ]},
+      vehicles: {
+        label: '🚗 Vehicles',
+        items: [
         { name: "Car", emoji: "🚗" },
         { name: "Bus", emoji: "🚌" },
         { name: "Bicycle", emoji: "🚲" },
@@ -405,8 +396,10 @@ select:focus {
         { name: "Taxi", emoji: "🚖" },
         { name: "Ship", emoji: "🚢" },
         { name: "Submarine", emoji: "🛳️" }
-      ],
-      animals: [
+      ]},
+      animals: {
+        label: '🐶 Animals',
+        items: [
         { name: "Dog", emoji: "🐶" },
         { name: "Cat", emoji: "🐱" },
         { name: "Mouse", emoji: "🐭" },
@@ -460,8 +453,10 @@ select:focus {
         { name: "Dragon", emoji: "🐉" },
         { name: "Sauropod", emoji: "🦕" },
         { name: "T-Rex", emoji: "🦖" }
-      ],
-      sports: [
+      ]},
+      sports: {
+        label: '⚽ Sports',
+        items: [
         { name: "playing football", emoji: "⚽️" },
         { name: "playing basketball", emoji: "🏀" },
         { name: "rollerblading", emoji: "🛼" },
@@ -472,8 +467,10 @@ select:focus {
         { name: "bouncing", emoji: "⛹" },
         { name: "throwing a ball", emoji: "🤽‍♀️" },
         { name: "playing baseball", emoji: "🥎" }
-      ],
-      clothing: [
+      ]},
+      clothing: {
+        label: '👕 Clothing',
+        items: [
         { name: "T-Shirt", emoji: "👕" },
         { name: "dress", emoji: "👗" },
         { name: "trousers", emoji: "👖" },
@@ -488,8 +485,10 @@ select:focus {
         { name: "bag", emoji: "🎒" },
         { name: "sunglasses", emoji: "🕶️" },
         { name: "umbrella", emoji: "☂️" }
-      ],
-      halloween: [
+      ]},
+      halloween: {
+        label: '🎃 Halloween',
+        items: [
         { name: "Ghost", emoji: "👻" },
         { name: "Pumpkin", emoji: "🎃" },
         { name: "Witch", emoji: "🧙‍♀️" },
@@ -515,8 +514,10 @@ select:focus {
         { name: "Magic Wand", emoji: "🪄" },
         { name: "Tombstone", emoji: "🪦" },
         { name: "Candle", emoji: "🕯️" }
-      ],
-      house: [
+      ]},
+      house: {
+        label: '🏠 House',
+        items: [
        { name: "Bathroom", emoji: "🛀" },
        { name: "Toilet", emoji: "🧻" },
        { name: "Living room", emoji: "🛋️" },
@@ -527,9 +528,11 @@ select:focus {
        { name: "Door", emoji: "🚪" },
        { name: "Soap", emoji: "🧼" },
        { name: "Toothbrush", emoji: "🪥" },
-       { name: "Bedroom", emoji: "🛏️" } // Empty array - user will add their own words
-      ],
-      feelings: [
+       { name: "Bedroom", emoji: "🛏️" }
+      ]},
+      feelings: {
+        label: '😀 Feelings',
+        items: [
        { name: "Tired", emoji: "😴 unaveny" },
        { name: "Scared", emoji: "😨 vydeseny" },
        { name: "Angry", emoji: "😡 rozzlobeny" },
@@ -542,9 +545,10 @@ select:focus {
        { name: "Sad", emoji: "😢 smutny" },
        { name: "Excited", emoji: "🥳 nadseny" },
        { name: "Happy", emoji: "😀 stastny" }
-        // Empty array - user will add their own words
-      ],
-      exoticAnimals: [
+      ]},
+      exoticAnimals: {
+        label: '🦒 Exotic Animals',
+        items: [
        { name: "giraffe", emoji: "🦒" },
        { name: "camel", emoji: "🐪" },
        { name: "zebra", emoji: "🦓" },
@@ -558,9 +562,10 @@ select:focus {
        { name: "kangaroo", emoji: "🦘" },
        { name: "hippo", emoji: "🦛" },
        { name: "parrot", emoji: "🦜" }
-        // Empty array - user will add their own words
-      ],
-      theWorldofWork: [
+      ]},
+      theWorldofWork: {
+        label: '💼 The World of Work',
+        items: [
        { name: "farmer", emoji: "👨‍🌾" },
        { name: "bus driver", emoji: "🚌" },
        { name: "office worker", emoji: "💼" },
@@ -572,8 +577,7 @@ select:focus {
        { name: "nurse", emoji: "👩🏼‍⚕️" },
        { name: "singer", emoji: "🎵" },
        { name: "scientist", emoji: "👩🏼‍🔬" }
-        // Empty array - user will add their own words
-      ]
+      ]}
     };
 
     // State
@@ -635,7 +639,7 @@ select:focus {
 
     const createFlashcards = () => {
       grid.innerHTML = '';
-      const items = shuffleArray(categories[selectedCategory]).slice(0, 9);
+      const items = shuffleArray(categories[selectedCategory].items).slice(0, 9);
       items.forEach(item => grid.appendChild(createFlashcard(item)));
     };
 
@@ -652,12 +656,12 @@ select:focus {
     };
 
     // Event listeners
-    // Populate category select from categoryMeta
+    // Populate category select from categories
     const categorySelect = document.getElementById('categorySelect');
-    Object.entries(categoryMeta).forEach(([key, label]) => {
+    Object.entries(categories).forEach(([key, cat]) => {
       const option = document.createElement('option');
       option.value = key;
-      option.textContent = label;
+      option.textContent = cat.label;
       categorySelect.appendChild(option);
     });
 
@@ -850,7 +854,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.6.4
+              ${platformText} • Current: v2.6.5
             </div>
           </div>
         </div>
@@ -924,7 +928,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.6.4';
+      versionDisplay.textContent = 'v2.6.5';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v5.6'; // DRY category refactor
-const APP_VERSION = '2.6.4'; // DRY category refactor
+const CACHE_NAME = 'flashcards-v5.7'; // Unified categories structure
+const APP_VERSION = '2.6.5'; // Unified categories structure
 const urlsToCache = [
   './',
   './index.html',
