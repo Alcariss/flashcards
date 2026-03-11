@@ -321,6 +321,7 @@ select:focus {
       <option value="house">House</option>
       <option value="feelings">Feelings</option>
       <option value="exoticAnimals">Exotic Animals</option>
+      <option value="theWorldofWork">The World of Work</option>
     </select>
     <button id="refreshBtn" onclick="generateNewSet()" title="Generate new set of cards">
       ↻
@@ -537,6 +538,20 @@ select:focus {
        { name: "kangaroo", emoji: "🦘" },
        { name: "hippo", emoji: "🦛" },
        { name: "parrot", emoji: "🦜" }
+        // Empty array - user will add their own words
+      ],
+      theWorldofWork: [
+       { name: "farmer", emoji: "👨‍🌾" },
+       { name: "bus driver", emoji: "🚌" },
+       { name: "office worker", emoji: "💼" },
+       { name: "doctor", emoji: "🩺" },
+       { name: "firefighter", emoji: "🧑🏼‍🚒" },
+       { name: "vet", emoji: "🐶" },
+       { name: "police officer", emoji: "👮" },
+       { name: "dentist", emoji: "🦷" },
+       { name: "nurse", emoji: "👩🏼‍⚕️" },
+       { name: "singer", emoji: "🎵" },
+       { name: "scientist", emoji: "👩🏼‍🔬" }
         // Empty array - user will add their own words
       ]
     };
@@ -796,7 +811,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.6.1
+              ${platformText} • Current: v2.6.2
             </div>
           </div>
         </div>
@@ -870,7 +885,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.6.1';
+      versionDisplay.textContent = 'v2.6.2';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
