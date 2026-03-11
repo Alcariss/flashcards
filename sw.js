@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v5.2'; // Version bump
-const APP_VERSION = '2.6.0'; // Version bump
+const CACHE_NAME = 'flashcards-v5.3'; // Fix version display
+const APP_VERSION = '2.6.1'; // Fix version display
 const urlsToCache = [
   './',
   './index.html',
