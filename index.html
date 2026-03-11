@@ -236,6 +236,13 @@ select:focus {
   font-size: 24px; /* Keep text size as original */
 }
 
+/* Text that appears after emoji (e.g., Feelings category) */
+.emoji-text {
+  display: block;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .controls {
@@ -270,6 +277,10 @@ select:focus {
     font-size: 3rem; /* 48px for tablets */
   }
 
+  .emoji-text {
+    font-size: 0.9rem;
+  }
+
   .back {
     font-size: 20px; /* Keep text size as original */
   }
@@ -299,6 +310,10 @@ select:focus {
 
   .front {
     font-size: 2.5rem; /* 40px for mobile */
+  }
+
+  .emoji-text {
+    font-size: 0.75rem;
   }
 
   .back {
@@ -579,9 +594,20 @@ select:focus {
     const createFlashcard = (item) => {
       const card = document.createElement('div');
       card.className = 'flashcard';
+      
+      // Check if emoji field contains text after the emoji (e.g., "😴 unaveny")
+      const emojiMatch = item.emoji.match(/^(\p{Emoji}[\p{Emoji}\uFE0F\u200D]*)\s*(.*)$/u);
+      let frontContent;
+      if (emojiMatch && emojiMatch[2]) {
+        // Has emoji + text: keep emoji large, make text smaller
+        frontContent = `${emojiMatch[1]}<span class="emoji-text">${emojiMatch[2]}</span>`;
+      } else {
+        frontContent = item.emoji;
+      }
+      
       card.innerHTML = `
         <div class="inner">
-          <div class="front">${item.emoji}</div>
+          <div class="front">${frontContent}</div>
           <div class="back">${item.name}</div>
         </div>
       `;
@@ -811,7 +837,7 @@ select:focus {
               </button>
             </div>
             <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-              ${platformText} • Current: v2.6.2
+              ${platformText} • Current: v2.6.3
             </div>
           </div>
         </div>
@@ -885,7 +911,7 @@ select:focus {
         border-radius: 15px; font-size: 10px; opacity: 0.5; cursor: pointer;
         transition: opacity 0.3s ease;
       `;
-      versionDisplay.textContent = 'v2.6.2';
+      versionDisplay.textContent = 'v2.6.3';
       
       // Make version button clickable for PWA users
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;

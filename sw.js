@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v5.4'; // Version bump
-const APP_VERSION = '2.6.2'; // Version bump
+const CACHE_NAME = 'flashcards-v5.5'; // Feelings text size fix
+const APP_VERSION = '2.6.3'; // Feelings text size fix
 const urlsToCache = [
   './',
   './index.html',
