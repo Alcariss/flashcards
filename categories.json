@@ -249,5 +249,22 @@
       { "name": "singer", "emoji": "🎵" },
       { "name": "scientist", "emoji": "👩🏼‍🔬" }
     ]
+  },
+  "letseat": {
+    "label": "🍕 Let's Eat",
+    "items": [
+      { "name": "burger", "emoji": "🍔" },
+      { "name": "ice cream", "emoji": "🍦" },
+      { "name": "carrots", "emoji": "🥕" },
+      { "name": "bread", "emoji": "🍞" },
+      { "name": "pasta", "emoji": "🍝" },
+      { "name": "beans", "emoji": "🫘" },
+      { "name": "potatoes", "emoji": "🥔" },
+      { "name": "sweetcorn", "emoji": "🌽" },
+      { "name": "meat", "emoji": "🥩" },
+      { "name": "noodles", "emoji": "🍜" },
+      { "name": "tomatoes", "emoji": "🍅" },
+      { "name": "pepers", "emoji": "🌶️" }
+    ]
   }
 }

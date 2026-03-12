@@ -1,5 +1,5 @@
-const CACHE_NAME = 'flashcards-v6.0'; // Shared styles refactor
-const APP_VERSION = '2.8.0'; // Shared styles refactor
+const CACHE_NAME = 'flashcards-v6.1'; // Add Let's Eat category
+const APP_VERSION = '2.8.1'; // Add Let's Eat category
 const urlsToCache = [
   './',
   './index.html',
