@@ -266,5 +266,21 @@
       { "name": "tomatoes", "emoji": "🍅" },
       { "name": "pepers", "emoji": "🌶️" }
     ]
+  },
+  "plurals": {
+    "label": "🍕 Let's Eat",
+    "items": [
+      { "name": "🔪 knife", "emoji": "🔪🔪 knives" },
+      { "name": "shelf", "emoji": "shelves" },
+      { "name": "👦🏼person", "emoji": "👦🏼👦🏼people" },
+      { "name": "🧔🏽‍♂️man", "emoji": "🧔🏽‍♂️🧔🏽‍♂️men" },
+      { "name": "👩🏼‍🦰woman", "emoji": "👩🏼‍🦰👩🏼‍🦰women" },
+      { "name": "👧🏼child", "emoji": "👧🏼👧🏼children" },
+      { "name": "👯friends", "emoji": "👯👯friends" },
+      { "name": "🦷tooth", "emoji": "🦷🦷teeth" },
+      { "name": "🦶🏻foot", "emoji": "🦶🏻🦶🏻feet" },
+      { "name": "🪁kite", "emoji": "🪁🪁kites" },
+      { "name": "🐑sheep", "emoji": "🐑🐑sheep" }
+    ]
   }
 }
